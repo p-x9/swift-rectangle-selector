@@ -4,27 +4,27 @@ public class RectangleSelectorView: UIView {
 
     var config: Config = .default
 
-    let topLeftHandle = HandleView()
-    let topRightHandle = HandleView()
-    let bottomLeftHandle = HandleView()
-    let bottomRightHandle = HandleView()
+    private let topLeftHandle = HandleView()
+    private let topRightHandle = HandleView()
+    private let bottomLeftHandle = HandleView()
+    private let bottomRightHandle = HandleView()
 
-    let centerHandle = HandleView()
+    private let centerHandle = HandleView()
 
-    let topEdgeHandle = HandleView()
-    let bottomEdgeHandle = HandleView()
-    let leftEdgeHandle = HandleView()
-    let rightEdgeHandle = HandleView()
+    private let topEdgeHandle = HandleView()
+    private let bottomEdgeHandle = HandleView()
+    private let leftEdgeHandle = HandleView()
+    private let rightEdgeHandle = HandleView()
 
-    let guideView = GuideView()
+    private let guideView = GuideView()
 
-    var topConstraint: NSLayoutConstraint!
-    var bottomConstraint: NSLayoutConstraint!
-    var leftConstraint: NSLayoutConstraint!
-    var rightConstraint: NSLayoutConstraint!
+    private var topConstraint: NSLayoutConstraint!
+    private var bottomConstraint: NSLayoutConstraint!
+    private var leftConstraint: NSLayoutConstraint!
+    private var rightConstraint: NSLayoutConstraint!
 
-    var centerXConstraint: NSLayoutConstraint!
-    var centerYConstraint: NSLayoutConstraint!
+    private var centerXConstraint: NSLayoutConstraint!
+    private var centerYConstraint: NSLayoutConstraint!
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -40,10 +40,6 @@ extension RectangleSelectorView {
     private func setup() {
         setupViews()
         setupViewConstraints()
-
-        layoutIfNeeded()
-
-        print(guideView.frame)
     }
 
     private func setupViews() {
