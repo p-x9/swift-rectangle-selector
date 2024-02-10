@@ -15,6 +15,7 @@ protocol HandleViewDelegate: AnyObject {
 final class HandleView: UIView {
 
     var isEnabled: Bool = true
+    var gestureStartPoint: CGPoint = .zero
 
     weak var delegate: HandleViewDelegate?
 
@@ -34,6 +35,9 @@ final class HandleView: UIView {
 
     @objc
     func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
+        if gestureRecognizer.state == .began {
+            gestureStartPoint = gestureRecognizer.location(in: self)
+        }
         delegate?.handleView(self, updatePanState: gestureRecognizer)
     }
 }

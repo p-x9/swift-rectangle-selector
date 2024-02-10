@@ -135,31 +135,37 @@ extension RectangleSelectorView {
 
 extension RectangleSelectorView: HandleViewDelegate {
     func handleView(_ view: HandleView, updatePanState recognizer: UIPanGestureRecognizer) {
-        let location = recognizer.location(in: self)
+        var location = recognizer.location(in: self)
+        location.x -= view.gestureStartPoint.x
+        location.y -= view.gestureStartPoint.y
+
+        let horizontal = location.x + view.frame.width / 2
+        let vertical = location.y + view.frame.height / 2
+
         switch view {
         case topLeftHandle:
-            topConstraint.constant = location.y
-            leftConstraint.constant = location.x
+            topConstraint.constant = vertical
+            leftConstraint.constant = horizontal
         case topRightHandle:
-            topConstraint.constant = location.y
-            rightConstraint.constant = location.x - self.frame.size.width
+            topConstraint.constant = vertical
+            rightConstraint.constant = horizontal - self.frame.size.width
         case bottomLeftHandle:
-            bottomConstraint.constant = location.y - self.frame.size.height
-            leftConstraint.constant = location.x
+            bottomConstraint.constant = vertical - self.frame.size.height
+            leftConstraint.constant = horizontal
         case bottomRightHandle:
-            bottomConstraint.constant = location.y - self.frame.size.height
-            rightConstraint.constant = location.x - self.frame.size.width
+            bottomConstraint.constant = vertical - self.frame.size.height
+            rightConstraint.constant = horizontal - self.frame.size.width
         case topEdgeHandle:
-            topConstraint.constant = location.y
+            topConstraint.constant = vertical
         case bottomEdgeHandle:
-            bottomConstraint.constant = location.y - self.frame.size.height
+            bottomConstraint.constant = vertical - self.frame.size.height
         case leftEdgeHandle:
-            leftConstraint.constant = location.x
+            leftConstraint.constant = horizontal
         case rightEdgeHandle:
-            rightConstraint.constant = location.x - self.frame.size.width
+            rightConstraint.constant = horizontal - self.frame.size.width
         case centerHandle:
-            let horizontal = location.x - centerHandle.frame.minX
-            let vertical = location.y - centerHandle.frame.minY
+            let horizontal = location.x - view.frame.minX
+            let vertical = location.y - view.frame.minY
             topConstraint.constant += vertical
             bottomConstraint.constant += vertical
             leftConstraint.constant += horizontal
