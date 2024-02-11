@@ -116,7 +116,7 @@ extension RectangleSelectorView {
 
     private func setupViewConstraints() {
         guideView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         topConstraint = guideView.topAnchor.constraint(equalTo: topAnchor)
         bottomConstraint = guideView.bottomAnchor.constraint(equalTo: bottomAnchor)
         leftConstraint = guideView.leftAnchor.constraint(equalTo: leftAnchor)
@@ -165,7 +165,7 @@ extension RectangleSelectorView {
 }
 
 extension RectangleSelectorView: HandleViewDelegate {
-    func handleView(_ view: HandleView, updatePanState recognizer: UIPanGestureRecognizer) {
+    func handleView(_ view: HandleView, updatePanState recognizer: UITouch) {
         var location = recognizer.location(in: self)
         location.x -= view.gestureStartPoint.x
         location.y -= view.gestureStartPoint.y

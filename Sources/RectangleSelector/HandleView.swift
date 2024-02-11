@@ -9,7 +9,7 @@
 import UIKit
 
 protocol HandleViewDelegate: AnyObject {
-    func handleView(_ view: HandleView, updatePanState recognizer: UIPanGestureRecognizer)
+    func handleView(_ view: HandleView, updatePanState recognizer: UITouch)
 }
 
 final class HandleView: UIView {
@@ -32,20 +32,10 @@ final class HandleView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    @objc
-    func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer) {
-        if gestureRecognizer.state == .began {
-            gestureStartPoint = gestureRecognizer.location(in: self)
-        }
-        delegate?.handleView(self, updatePanState: gestureRecognizer)
-    }
 }
 
 extension HandleView {
     private func setup() {
-        isExclusiveTouch = true
-        
         translatesAutoresizingMaskIntoConstraints = false
         heightConstraint = heightAnchor.constraint(equalToConstant: 0)
         widthConstraint = widthAnchor.constraint(equalToConstant: 0)
@@ -54,9 +44,6 @@ extension HandleView {
             heightConstraint,
             widthConstraint
         ])
-
-        panGestureRecognizer.addTarget(self, action: #selector(handlePanGesture(_:)))
-        addGestureRecognizer(panGestureRecognizer)
     }
 }
 
@@ -69,5 +56,27 @@ extension HandleView {
 
         heightConstraint.constant = config.size
         widthConstraint.constant = config.size
+    }
+}
+
+extension HandleView {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        gestureStartPoint = touch.location(in: self)
+    }
+
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        delegate?.handleView(self, updatePanState: touch)
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        delegate?.handleView(self, updatePanState: touch)
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        delegate?.handleView(self, updatePanState: touch)
     }
 }
