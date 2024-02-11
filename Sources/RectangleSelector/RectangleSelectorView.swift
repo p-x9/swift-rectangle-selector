@@ -37,6 +37,17 @@ public class RectangleSelectorView: UIView {
 }
 
 extension RectangleSelectorView {
+    var guideEdgeConstraints: [NSLayoutConstraint] {
+        [
+            topConstraint,
+            bottomConstraint,
+            leftConstraint,
+            rightConstraint
+        ]
+    }
+}
+
+extension RectangleSelectorView {
     private func setup() {
         setupViews()
         setupViewConstraints()
@@ -95,11 +106,15 @@ extension RectangleSelectorView {
         leftConstraint = guideView.leftAnchor.constraint(equalTo: leftAnchor)
         rightConstraint = guideView.rightAnchor.constraint(equalTo: rightAnchor)
 
+        guideEdgeConstraints.forEach {
+            $0.priority = .defaultHigh
+        }
+
+        NSLayoutConstraint.activate(guideEdgeConstraints)
+
         NSLayoutConstraint.activate([
-            topConstraint,
-            bottomConstraint,
-            leftConstraint,
-            rightConstraint
+            guideView.heightAnchor.constraint(greaterThanOrEqualToConstant: 0),
+            guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: 0),
         ])
 
         NSLayoutConstraint.activate([
