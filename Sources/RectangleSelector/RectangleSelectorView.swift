@@ -37,6 +37,30 @@ public class RectangleSelectorView: UIView {
 }
 
 extension RectangleSelectorView {
+    var vertexHandles: [HandleView] {
+        [
+            topLeftHandle,
+            topRightHandle,
+            bottomLeftHandle,
+            bottomRightHandle,
+        ]
+    }
+    
+    var edgeHandles: [HandleView] {
+        [
+            topEdgeHandle,
+            bottomEdgeHandle,
+            leftEdgeHandle,
+            rightEdgeHandle,
+        ]
+    }
+
+    var handles: [HandleView] {
+        vertexHandles +
+        [centerHandle] +
+        edgeHandles
+    }
+
     var guideEdgeConstraints: [NSLayoutConstraint] {
         [
             topConstraint,
@@ -58,33 +82,23 @@ extension RectangleSelectorView {
 
         guideView.apply(config.guideConfig)
 
-        topLeftHandle.apply(config.vertexHandleConfig)
-        topRightHandle.apply(config.vertexHandleConfig)
-        bottomLeftHandle.apply(config.vertexHandleConfig)
-        bottomRightHandle.apply(config.vertexHandleConfig)
+        // apply handle config
+        vertexHandles.forEach {
+            $0.apply(config.vertexHandleConfig)
+        }
 
         centerHandle.apply(config.edgeHandleConfig)
 
-        topEdgeHandle.apply(config.edgeHandleConfig)
-        bottomEdgeHandle.apply(config.edgeHandleConfig)
-        leftEdgeHandle.apply(config.edgeHandleConfig)
-        rightEdgeHandle.apply(config.edgeHandleConfig)
+        edgeHandles.forEach {
+            $0.apply(config.edgeHandleConfig)
+        }
 
+        // set delegates
+        handles.forEach {
+            $0.delegate = self
+        }
 
-        topLeftHandle.delegate = self
-        topRightHandle.delegate = self
-        bottomLeftHandle.delegate = self
-        bottomRightHandle.delegate = self
-
-        centerHandle.delegate = self
-
-        topEdgeHandle.delegate = self
-        bottomEdgeHandle.delegate = self
-        leftEdgeHandle.delegate = self
-        rightEdgeHandle.delegate = self
-
-        guideView.translatesAutoresizingMaskIntoConstraints = false
-
+        // add subview
         addSubview(guideView)
 
         addSubview(topLeftHandle)
@@ -101,6 +115,8 @@ extension RectangleSelectorView {
     }
 
     private func setupViewConstraints() {
+        guideView.translatesAutoresizingMaskIntoConstraints = false
+        
         topConstraint = guideView.topAnchor.constraint(equalTo: topAnchor)
         bottomConstraint = guideView.bottomAnchor.constraint(equalTo: bottomAnchor)
         leftConstraint = guideView.leftAnchor.constraint(equalTo: leftAnchor)
