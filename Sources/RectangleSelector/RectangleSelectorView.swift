@@ -165,8 +165,8 @@ extension RectangleSelectorView {
 }
 
 extension RectangleSelectorView: HandleViewDelegate {
-    func handleView(_ view: HandleView, updatePanState recognizer: UITouch) {
-        var location = recognizer.location(in: self)
+    func handleView(_ view: HandleView, moved touch: UITouch) {
+        var location = touch.location(in: self)
         location.x -= view.gestureStartPoint.x
         location.y -= view.gestureStartPoint.y
 
