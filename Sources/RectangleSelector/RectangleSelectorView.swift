@@ -18,6 +18,19 @@ public class RectangleSelectorView: UIView {
 
     private let guideView = GuideView()
 
+    private let overlayLayer: CAShapeLayer = {
+        let layer = CAShapeLayer()
+        layer.fillColor = UIColor.black.withAlphaComponent(0.5).cgColor
+        return layer
+    }()
+
+    private let overlayMaskLayer: CAShapeLayer  = {
+        let layer = CAShapeLayer()
+        layer.fillColor = UIColor.black.cgColor
+        layer.fillRule = .evenOdd
+        return layer
+    }()
+
     private var topConstraint: NSLayoutConstraint!
     private var bottomConstraint: NSLayoutConstraint!
     private var leftConstraint: NSLayoutConstraint!
@@ -33,6 +46,20 @@ public class RectangleSelectorView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    public override func layoutSublayers(of layer: CALayer) {
+        super.layoutSublayers(of: layer)
+
+        CATransaction.withoutAnimation {
+            overlayLayer.frame = self.bounds
+            overlayLayer.path = .init(rect: self.bounds, transform: nil)
+
+            overlayMaskLayer.frame = self.bounds
+            let path = UIBezierPath(rect: self.guideView.frame)
+            path.append(.init(rect: self.bounds))
+            overlayMaskLayer.path = path.cgPath
+        }
     }
 }
 
@@ -78,7 +105,9 @@ extension RectangleSelectorView {
     }
 
     private func setupViews() {
-        backgroundColor = .yellow
+        layer.addSublayer(overlayLayer)
+
+        overlayLayer.mask = overlayMaskLayer
 
         guideView.apply(config.guideConfig)
 
