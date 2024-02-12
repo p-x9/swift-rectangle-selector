@@ -14,12 +14,9 @@ protocol HandleViewDelegate: AnyObject {
 
 final class HandleView: UIView {
 
-    var isEnabled: Bool = true
     var gestureStartPoint: CGPoint = .zero
 
     weak var delegate: HandleViewDelegate?
-
-    private let panGestureRecognizer = UIPanGestureRecognizer()
 
     private var heightConstraint: NSLayoutConstraint!
     private var widthConstraint: NSLayoutConstraint!
