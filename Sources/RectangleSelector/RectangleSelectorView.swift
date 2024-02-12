@@ -93,7 +93,10 @@ extension RectangleSelectorView {
             $0.apply(config.edgeHandleConfig)
         }
 
+        centerHandle.isUserInteractionEnabled = false
+
         // set delegates
+        guideView.delegate = self
         handles.forEach {
             $0.delegate = self
         }
@@ -195,15 +198,25 @@ extension RectangleSelectorView: HandleViewDelegate {
         case rightEdgeHandle:
             rightConstraint.constant = horizontal - self.frame.size.width
         case centerHandle:
-            let horizontal = location.x - view.frame.minX
-            let vertical = location.y - view.frame.minY
-            topConstraint.constant += vertical
-            bottomConstraint.constant += vertical
-            leftConstraint.constant += horizontal
-            rightConstraint.constant += horizontal
+            break
         default:
             break
         }
+    }
+}
+
+extension RectangleSelectorView: GuideViewDelegate {
+    func guideView(_ view: GuideView, moved touch: UITouch) {
+        var location = touch.location(in: self)
+        location.x -= view.gestureStartPoint.x
+        location.y -= view.gestureStartPoint.y
+
+        let horizontal = location.x - view.frame.minX
+        let vertical = location.y - view.frame.minY
+        topConstraint.constant += vertical
+        bottomConstraint.constant += vertical
+        leftConstraint.constant += horizontal
+        rightConstraint.constant += horizontal
     }
 }
 //
