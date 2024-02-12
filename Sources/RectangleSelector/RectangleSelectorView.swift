@@ -154,6 +154,12 @@ extension RectangleSelectorView {
         leftConstraint = guideView.leftAnchor.constraint(equalTo: leftAnchor)
         rightConstraint = guideView.rightAnchor.constraint(equalTo: rightAnchor)
 
+        // FIXME: tmp
+        topConstraint.constant = 100
+        bottomConstraint.constant = -100
+        leftConstraint.constant = 50
+        rightConstraint.constant = -50
+
         guideEdgeConstraints.forEach {
             $0.priority = .defaultHigh
         }
@@ -241,11 +247,33 @@ extension RectangleSelectorView: GuideViewDelegate {
         location.y -= view.gestureStartPoint.y
 
         let horizontal = location.x - view.frame.minX
-        let vertical = location.y - view.frame.minY
-        topConstraint.constant += vertical
-        bottomConstraint.constant += vertical
-        leftConstraint.constant += horizontal
-        rightConstraint.constant += horizontal
+        var vertical = location.y - view.frame.minY
+
+        if topConstraint.constant + vertical < 0 {
+            let diff = topConstraint.constant - vertical
+            bottomConstraint.constant -= topConstraint.constant
+            view.gestureStartPoint.y -= diff
+            topConstraint.constant = 0
+        } else if bottomConstraint.constant + vertical > 0 {
+            let diff = bottomConstraint.constant - vertical
+            topConstraint.constant -= bottomConstraint.constant
+            view.gestureStartPoint.y -= diff
+            bottomConstraint.constant = 0
+        } else {
+            topConstraint.constant += vertical
+            bottomConstraint.constant += vertical
+        }
+
+        if leftConstraint.constant + horizontal < 0 {
+            rightConstraint.constant -= leftConstraint.constant
+            leftConstraint.constant = 0
+        } else if rightConstraint.constant + horizontal > 0 {
+            leftConstraint.constant -= rightConstraint.constant
+            rightConstraint.constant = 0
+        } else {
+            leftConstraint.constant += horizontal
+            rightConstraint.constant += horizontal
+        }
     }
 }
 //
