@@ -249,16 +249,16 @@ extension RectangleSelectorView: GuideViewDelegate {
         let horizontal = location.x - view.frame.minX
         var vertical = location.y - view.frame.minY
 
+        let locationInGuide = touch.location(in: view)
+
         if topConstraint.constant + vertical < 0 {
-            let diff = topConstraint.constant - vertical
             bottomConstraint.constant -= topConstraint.constant
-            view.gestureStartPoint.y -= diff
             topConstraint.constant = 0
+            view.gestureStartPoint.y = locationInGuide.y
         } else if bottomConstraint.constant + vertical > 0 {
-            let diff = bottomConstraint.constant - vertical
             topConstraint.constant -= bottomConstraint.constant
-            view.gestureStartPoint.y -= diff
             bottomConstraint.constant = 0
+            view.gestureStartPoint.y = locationInGuide.y
         } else {
             topConstraint.constant += vertical
             bottomConstraint.constant += vertical
@@ -267,9 +267,11 @@ extension RectangleSelectorView: GuideViewDelegate {
         if leftConstraint.constant + horizontal < 0 {
             rightConstraint.constant -= leftConstraint.constant
             leftConstraint.constant = 0
+            view.gestureStartPoint.x = locationInGuide.x
         } else if rightConstraint.constant + horizontal > 0 {
             leftConstraint.constant -= rightConstraint.constant
             rightConstraint.constant = 0
+            view.gestureStartPoint.x = locationInGuide.x
         } else {
             leftConstraint.constant += horizontal
             rightConstraint.constant += horizontal
