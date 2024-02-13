@@ -33,6 +33,7 @@ final class HandleView: UIView {
 
 extension HandleView {
     private func setup() {
+        isExclusiveTouch = true
         translatesAutoresizingMaskIntoConstraints = false
         heightConstraint = heightAnchor.constraint(equalToConstant: 0)
         widthConstraint = widthAnchor.constraint(equalToConstant: 0)
