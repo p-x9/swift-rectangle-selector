@@ -34,8 +34,7 @@ extension GuideView {
 
 extension GuideView {
     func apply(_ config: GuideConfig) {
-        backgroundColor = config.color.withAlphaComponent(CGFloat(config.opacity))
-//        layer.opacity = config.opacity
+        backgroundColor = config.color
         layer.borderWidth = config.lineWidth
         layer.borderColor = config.lineColor.cgColor
     }

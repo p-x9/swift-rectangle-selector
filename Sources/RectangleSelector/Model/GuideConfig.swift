@@ -13,16 +13,14 @@ struct GuideConfig {
     let lineColor: UIColor
 
     let color: UIColor
-    let opacity: Float
 }
 
 extension GuideConfig {
     static var `default`: GuideConfig {
         .init(
             lineWidth: 1,
-            lineColor: .black,
-            color: .gray,
-            opacity: 0.25
+            lineColor: .white,
+            color: .clear
         )
     }
 }
