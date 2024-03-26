@@ -3,6 +3,7 @@ import UIKit
 public class RectangleSelectorView: UIView {
 
     var config: Config = .default
+    var aspectMode: AspectMode = .free
 
     private let topLeftHandle = HandleView()
     private let topRightHandle = HandleView()
@@ -208,69 +209,71 @@ extension RectangleSelectorView: HandleViewDelegate {
         location.x -= view.gestureStartPoint.x
         location.y -= view.gestureStartPoint.y
 
-        var horizontal = location.x + view.frame.width / 2
-        var vertical = location.y + view.frame.height / 2
+        let horizontal = location.x + view.frame.width / 2
+        let vertical = location.y + view.frame.height / 2
 
-        switch view {
-//        case topLeftHandle:
-//            topConstraint.constant = vertical
-//            leftConstraint.constant = horizontal
-//        case topRightHandle:
-//            topConstraint.constant = vertical
-//            rightConstraint.constant = horizontal - self.frame.size.width
-//        case bottomLeftHandle:
-//            bottomConstraint.constant = vertical - self.frame.size.height
-//            leftConstraint.constant = horizontal
-//        case bottomRightHandle:
-//            bottomConstraint.constant = vertical - self.frame.size.height
-//            rightConstraint.constant = horizontal - self.frame.size.width
-        case topEdgeHandle:
-            topConstraint.constant = vertical
-        case bottomEdgeHandle:
-            bottomConstraint.constant = vertical - self.frame.size.height
-        case leftEdgeHandle:
-            leftConstraint.constant = horizontal
-        case rightEdgeHandle:
-            rightConstraint.constant = horizontal - self.frame.size.width
-        case centerHandle:
-            break
-        default:
-            break
-        }
+        switch aspectMode {
+        case .free:
+            switch view {
+            case topEdgeHandle:
+                topConstraint.constant = vertical
+            case bottomEdgeHandle:
+                bottomConstraint.constant = vertical - self.frame.size.height
+            case leftEdgeHandle:
+                leftConstraint.constant = horizontal
+            case rightEdgeHandle:
+                rightConstraint.constant = horizontal - self.frame.size.width
+            case centerHandle:
+                break
+            case topLeftHandle:
+                topConstraint.constant = vertical
+                leftConstraint.constant = horizontal
+            case topRightHandle:
+                topConstraint.constant = vertical
+                rightConstraint.constant = horizontal - self.frame.size.width
+            case bottomLeftHandle:
+                bottomConstraint.constant = vertical - self.frame.size.height
+                leftConstraint.constant = horizontal
+            case bottomRightHandle:
+                bottomConstraint.constant = vertical - self.frame.size.height
+                rightConstraint.constant = horizontal - self.frame.size.width
+            default:
+                break
+            }
 
-        let aspectRatio =  1 / 1.5
-
-        switch view {
-        case topLeftHandle:
-            let size = CGSize(
-                width: frame.width - horizontal + rightConstraint.constant,
-                height: frame.height - vertical + bottomConstraint.constant
-            ).adjusted(with: aspectRatio)
-            topConstraint.constant = frame.height - size.height + bottomConstraint.constant
-            leftConstraint.constant = frame.width - size.width + rightConstraint.constant
-        case topRightHandle:
-            let size = CGSize(
-                width: frame.width - leftConstraint.constant + horizontal - frame.size.width,
-                height: frame.height - vertical + bottomConstraint.constant
-            ).adjusted(with: aspectRatio)
-            topConstraint.constant = frame.height - size.height + bottomConstraint.constant
-            rightConstraint.constant = -(frame.width - size.width - leftConstraint.constant)
-        case bottomLeftHandle:
-            let size = CGSize(
-                width: frame.width - horizontal + rightConstraint.constant,
-                height: frame.height - topConstraint.constant + vertical - frame.size.height
-            ).adjusted(with: aspectRatio)
-            bottomConstraint.constant = -(frame.height - size.height - topConstraint.constant)
-            leftConstraint.constant = frame.width - size.width + rightConstraint.constant
-        case bottomRightHandle:
-            let size = CGSize(
-                width: frame.width - leftConstraint.constant + horizontal - frame.size.width,
-                height: frame.height - topConstraint.constant + vertical - frame.size.height
-            ).adjusted(with: aspectRatio)
-            bottomConstraint.constant = -(frame.height - size.height - topConstraint.constant)
-            rightConstraint.constant = -(frame.width - size.width - leftConstraint.constant)
-        default:
-            break
+        case let .fixed(aspectRatio):
+            switch view {
+            case topLeftHandle:
+                let size = CGSize(
+                    width: frame.width - horizontal + rightConstraint.constant,
+                    height: frame.height - vertical + bottomConstraint.constant
+                ).adjusted(with: aspectRatio)
+                topConstraint.constant = frame.height - size.height + bottomConstraint.constant
+                leftConstraint.constant = frame.width - size.width + rightConstraint.constant
+            case topRightHandle:
+                let size = CGSize(
+                    width: frame.width - leftConstraint.constant + horizontal - frame.size.width,
+                    height: frame.height - vertical + bottomConstraint.constant
+                ).adjusted(with: aspectRatio)
+                topConstraint.constant = frame.height - size.height + bottomConstraint.constant
+                rightConstraint.constant = -(frame.width - size.width - leftConstraint.constant)
+            case bottomLeftHandle:
+                let size = CGSize(
+                    width: frame.width - horizontal + rightConstraint.constant,
+                    height: frame.height - topConstraint.constant + vertical - frame.size.height
+                ).adjusted(with: aspectRatio)
+                bottomConstraint.constant = -(frame.height - size.height - topConstraint.constant)
+                leftConstraint.constant = frame.width - size.width + rightConstraint.constant
+            case bottomRightHandle:
+                let size = CGSize(
+                    width: frame.width - leftConstraint.constant + horizontal - frame.size.width,
+                    height: frame.height - topConstraint.constant + vertical - frame.size.height
+                ).adjusted(with: aspectRatio)
+                bottomConstraint.constant = -(frame.height - size.height - topConstraint.constant)
+                rightConstraint.constant = -(frame.width - size.width - leftConstraint.constant)
+            default:
+                break
+            }
         }
     }
 }
@@ -282,7 +285,7 @@ extension RectangleSelectorView: GuideViewDelegate {
         location.y -= view.gestureStartPoint.y
 
         let horizontal = location.x - view.frame.minX
-        var vertical = location.y - view.frame.minY
+        let vertical = location.y - view.frame.minY
 
         let locationInGuide = touch.location(in: view)
 
