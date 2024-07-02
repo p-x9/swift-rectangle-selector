@@ -4,6 +4,7 @@ public class RectangleSelectorView: UIView {
 
     var config: Config = .default
     var aspectMode: AspectMode = .free
+    var minimumSize: CGSize?
 
     private let topLeftHandle = HandleView()
     private let topRightHandle = HandleView()
@@ -39,6 +40,20 @@ public class RectangleSelectorView: UIView {
 
     private var centerXConstraint: NSLayoutConstraint!
     private var centerYConstraint: NSLayoutConstraint!
+
+    public var defaultMinimumSize: CGSize {
+        let minLength = config.vertexHandleConfig.size / 2 * 2 + config.edgeHandleConfig.size
+        switch aspectMode {
+        case .free:
+            return .init(width: minLength, height: minLength)
+        case .fixed(let ratio):
+            if ratio > 1 { // width > height
+                return .init(width: minLength * ratio, height: minLength)
+            } else { // width <= height
+                return .init(width: minLength, height: minLength / ratio)
+            }
+        }
+    }
 
     public override init(frame: CGRect) {
         super.init(frame: frame)
@@ -167,9 +182,15 @@ extension RectangleSelectorView {
 
         NSLayoutConstraint.activate(guideEdgeConstraints)
 
+        // Minimum size
+        var minimumSize = self.defaultMinimumSize
+        if let _minumumSize = self.minimumSize {
+            minimumSize.height = max(minimumSize.height, _minumumSize.height)
+            minimumSize.width = max(minimumSize.width, _minumumSize.width)
+        }
         NSLayoutConstraint.activate([
-            guideView.heightAnchor.constraint(greaterThanOrEqualToConstant: 0),
-            guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: 0),
+            guideView.heightAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.height),
+            guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.width),
         ])
 
         NSLayoutConstraint.activate([
@@ -206,9 +227,12 @@ extension RectangleSelectorView {
 extension RectangleSelectorView: HandleViewDelegate {
     func handleView(_ view: HandleView, moved touch: UITouch) {
         var location = touch.location(in: self)
+
+        // consider touched position in handle
         location.x -= view.gestureStartPoint.x
         location.y -= view.gestureStartPoint.y
 
+        // Absolute handle position in self
         let horizontal = location.x + view.frame.width / 2
         let vertical = location.y + view.frame.height / 2
 
