@@ -189,8 +189,14 @@ extension RectangleSelectorView {
             minimumSize.width = max(minimumSize.width, _minumumSize.width)
         }
         NSLayoutConstraint.activate([
+            // Constraints to allow selection only within an area.
+            guideView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor),
+            guideView.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
+            guideView.leftAnchor.constraint(greaterThanOrEqualTo: leftAnchor),
+            guideView.rightAnchor.constraint(lessThanOrEqualTo: rightAnchor),
+            // Constraints for minimum size
             guideView.heightAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.height),
-            guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.width),
+            guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.width)
         ])
 
         NSLayoutConstraint.activate([
