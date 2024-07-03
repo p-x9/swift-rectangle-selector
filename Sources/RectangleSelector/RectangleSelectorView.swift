@@ -18,6 +18,8 @@ public class RectangleSelectorView: UIView {
     private let leftEdgeHandle = HandleView()
     private let rightEdgeHandle = HandleView()
 
+    private let gridView = GridView()
+
     private let guideView = GuideView()
 
     private let overlayLayer: CAShapeLayer = {
@@ -149,6 +151,8 @@ extension RectangleSelectorView {
         // add subview
         addSubview(guideView)
 
+        guideView.addSubview(gridView)
+
         addSubview(topLeftHandle)
         addSubview(topRightHandle)
         addSubview(bottomLeftHandle)
@@ -164,6 +168,7 @@ extension RectangleSelectorView {
 
     private func setupViewConstraints() {
         guideView.translatesAutoresizingMaskIntoConstraints = false
+        gridView.translatesAutoresizingMaskIntoConstraints = false
 
         topConstraint = guideView.topAnchor.constraint(equalTo: topAnchor)
         bottomConstraint = guideView.bottomAnchor.constraint(equalTo: bottomAnchor)
@@ -197,6 +202,13 @@ extension RectangleSelectorView {
             // Constraints for minimum size
             guideView.heightAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.height),
             guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.width)
+        ])
+
+        NSLayoutConstraint.activate([
+            gridView.topAnchor.constraint(equalTo: guideView.topAnchor),
+            gridView.bottomAnchor.constraint(equalTo: guideView.bottomAnchor),
+            gridView.leftAnchor.constraint(equalTo: guideView.leftAnchor),
+            gridView.rightAnchor.constraint(equalTo: guideView.rightAnchor),
         ])
 
         NSLayoutConstraint.activate([
