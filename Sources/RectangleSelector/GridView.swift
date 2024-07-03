@@ -30,11 +30,13 @@ class GridView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
 
-        horizontalReplicator.frame = bounds
-        verticalReplicator.frame = bounds
+        CATransaction.withoutAnimation {
+            horizontalReplicator.frame = bounds
+            verticalReplicator.frame = bounds
 
-        updateLineLayer()
-        updateReplicator()
+            updateLineLayer()
+            updateReplicator()
+        }
     }
 }
 
@@ -49,10 +51,8 @@ extension GridView {
 
         updateReplicator()
 
-        horizontalLineLayer.borderWidth = config.lineWidth
-        horizontalLineLayer.borderColor = config.lineColor.cgColor
-        verticalLineLayer.borderWidth = config.lineWidth
-        verticalLineLayer.borderColor = config.lineColor.cgColor
+        horizontalLineLayer.backgroundColor = config.lineColor.cgColor
+        verticalLineLayer.backgroundColor = config.lineColor.cgColor
     }
 }
 
@@ -63,6 +63,14 @@ extension GridView {
 
         horizontalReplicator.addSublayer(horizontalLineLayer)
         verticalReplicator.addSublayer(verticalLineLayer)
+
+        // To aoid line layer flickering when lineWidth is less than 1.
+        if traitCollection.displayScale != 0 {
+            horizontalLineLayer.rasterizationScale = traitCollection.displayScale
+            verticalLineLayer.rasterizationScale = traitCollection.displayScale
+            horizontalLineLayer.shouldRasterize = true
+            verticalLineLayer.shouldRasterize = true
+        }
 
         apply(config)
         updateLineLayer()
