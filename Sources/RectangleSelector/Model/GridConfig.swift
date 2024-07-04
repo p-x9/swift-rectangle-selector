@@ -20,8 +20,8 @@ extension GridConfig {
         .init(
             numberOfRows: 3,
             numberOfColmuns: 3,
-            lineWidth: 0.5,
-            lineColor: .white.withAlphaComponent(0.8)
+            lineWidth: 0.8,
+            lineColor: .white
         )
     }
 }
