@@ -77,7 +77,7 @@ extension GridView {
     }
 
     private func updateLineLayer() {
-        let size = frame.size
+        let size = bounds.size
         let horizontalOffset = size.width / CGFloat(config.numberOfColmuns)
         let verticalOffset = size.height / CGFloat(config.numberOfRows)
 
@@ -86,19 +86,19 @@ extension GridView {
                 x: horizontalOffset,
                 y: 0
             ),
-            size: .init(width: config.lineWidth, height: frame.height)
+            size: .init(width: config.lineWidth, height: size.height)
         )
         verticalLineLayer.frame = .init(
             origin: .init(
                 x: 0,
                 y: verticalOffset
             ),
-            size: .init(width: frame.width, height: config.lineWidth)
+            size: .init(width: size.width, height: config.lineWidth)
         )
     }
 
     private func updateReplicator() {
-        let size = frame.size
+        let size = bounds.size
         let horizontalOffset = size.width / CGFloat(config.numberOfColmuns)
         let verticalOffset = size.height / CGFloat(config.numberOfRows)
 
