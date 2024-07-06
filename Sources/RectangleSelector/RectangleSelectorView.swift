@@ -40,9 +40,6 @@ public class RectangleSelectorView: UIView {
     private var leftConstraint: NSLayoutConstraint!
     private var rightConstraint: NSLayoutConstraint!
 
-    private var centerXConstraint: NSLayoutConstraint!
-    private var centerYConstraint: NSLayoutConstraint!
-
     public var defaultMinimumSize: CGSize {
         let minLength = config.vertexHandleConfig.size / 2 * 2 + config.edgeHandleConfig.size
         switch aspectMode {
@@ -185,6 +182,7 @@ extension RectangleSelectorView {
             $0.priority = .defaultHigh
         }
 
+        // Grid constraints
         NSLayoutConstraint.activate(guideEdgeConstraints)
 
         // Minimum size
@@ -193,6 +191,8 @@ extension RectangleSelectorView {
             minimumSize.height = max(minimumSize.height, _minumumSize.height)
             minimumSize.width = max(minimumSize.width, _minumumSize.width)
         }
+
+        // Guide threshold Constraints
         NSLayoutConstraint.activate([
             // Constraints to allow selection only within an area.
             guideView.topAnchor.constraint(greaterThanOrEqualTo: topAnchor),
@@ -204,6 +204,7 @@ extension RectangleSelectorView {
             guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.width)
         ])
 
+        // Grid Constraints
         NSLayoutConstraint.activate([
             gridView.topAnchor.constraint(equalTo: guideView.topAnchor),
             gridView.bottomAnchor.constraint(equalTo: guideView.bottomAnchor),
@@ -211,6 +212,7 @@ extension RectangleSelectorView {
             gridView.rightAnchor.constraint(equalTo: guideView.rightAnchor),
         ])
 
+        // Vertex Handle center
         NSLayoutConstraint.activate([
             topLeftHandle.centerXAnchor.constraint(equalTo: guideView.leftAnchor),
             topLeftHandle.centerYAnchor.constraint(equalTo: guideView.topAnchor),
@@ -223,11 +225,23 @@ extension RectangleSelectorView {
             bottomRightHandle.centerYAnchor.constraint(equalTo: guideView.bottomAnchor),
         ])
 
+        // Vertex Handle size
+        NSLayoutConstraint.activate(
+            vertexHandles.map {
+                [
+                    $0.heightAnchor.constraint(equalToConstant: config.edgeHandleConfig.size),
+                    $0.widthAnchor.constraint(equalToConstant: config.edgeHandleConfig.size)
+                ]
+            }.flatMap { $0 }
+        )
+
+        // Center Handle
         NSLayoutConstraint.activate([
             centerHandle.centerXAnchor.constraint(equalTo: guideView.centerXAnchor),
             centerHandle.centerYAnchor.constraint(equalTo: guideView.centerYAnchor),
         ])
 
+        // Edge Handle center
         NSLayoutConstraint.activate([
             topEdgeHandle.centerXAnchor.constraint(equalTo: guideView.centerXAnchor),
             topEdgeHandle.centerYAnchor.constraint(equalTo: guideView.topAnchor),
@@ -238,6 +252,21 @@ extension RectangleSelectorView {
             leftEdgeHandle.centerYAnchor.constraint(equalTo: guideView.centerYAnchor),
             rightEdgeHandle.centerXAnchor.constraint(equalTo: guideView.rightAnchor),
             rightEdgeHandle.centerYAnchor.constraint(equalTo: guideView.centerYAnchor),
+        ])
+
+        // Edge Handle size
+        NSLayoutConstraint.activate([
+            topEdgeHandle.leftAnchor.constraint(equalTo: topLeftHandle.rightAnchor),
+            topEdgeHandle.rightAnchor.constraint(equalTo: topRightHandle.leftAnchor),
+
+            bottomEdgeHandle.leftAnchor.constraint(equalTo: bottomLeftHandle.rightAnchor),
+            bottomEdgeHandle.rightAnchor.constraint(equalTo: bottomRightHandle.leftAnchor),
+
+            leftEdgeHandle.topAnchor.constraint(equalTo: topLeftHandle.bottomAnchor),
+            leftEdgeHandle.bottomAnchor.constraint(equalTo: bottomLeftHandle.topAnchor),
+
+            rightEdgeHandle.topAnchor.constraint(equalTo: topRightHandle.bottomAnchor),
+            rightEdgeHandle.bottomAnchor.constraint(equalTo: bottomRightHandle.topAnchor),
         ])
     }
 }

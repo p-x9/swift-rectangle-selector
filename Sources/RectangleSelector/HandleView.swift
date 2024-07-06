@@ -14,6 +14,7 @@ protocol HandleViewDelegate: AnyObject {
 
 final class HandleView: UIView {
 
+    let shapeView: UIView = .init()
     var gestureStartPoint: CGPoint = .zero
 
     weak var delegate: HandleViewDelegate?
@@ -26,6 +27,7 @@ final class HandleView: UIView {
         setup()
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -35,22 +37,31 @@ extension HandleView {
     private func setup() {
         isExclusiveTouch = true
         translatesAutoresizingMaskIntoConstraints = false
-        heightConstraint = heightAnchor.constraint(equalToConstant: 0)
-        widthConstraint = widthAnchor.constraint(equalToConstant: 0)
+        shapeView.translatesAutoresizingMaskIntoConstraints = false
+        shapeView.isUserInteractionEnabled = false
+        shapeView.isExclusiveTouch = true
+
+        addSubview(shapeView)
+        heightConstraint = shapeView.heightAnchor.constraint(equalToConstant: 0)
+        widthConstraint = shapeView.widthAnchor.constraint(equalToConstant: 0)
 
         NSLayoutConstraint.activate([
             heightConstraint,
-            widthConstraint
+            widthConstraint,
+            shapeView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            shapeView.centerYAnchor.constraint(equalTo: centerYAnchor),
+            heightAnchor.constraint(greaterThanOrEqualTo: shapeView.heightAnchor),
+            widthAnchor.constraint(greaterThanOrEqualTo: shapeView.widthAnchor),
         ])
     }
 }
 
 extension HandleView {
     func apply(_ config: HandleConfig) {
-        backgroundColor = config.color
-        layer.borderWidth = config.lineWidth
-        layer.borderColor = config.lineColor.cgColor
-        layer.cornerRadius = config.cornerRadius
+        shapeView.backgroundColor = config.color
+        shapeView.layer.borderWidth = config.lineWidth
+        shapeView.layer.borderColor = config.lineColor.cgColor
+        shapeView.layer.cornerRadius = config.cornerRadius
 
         heightConstraint.constant = config.size
         widthConstraint.constant = config.size
