@@ -22,18 +22,7 @@ public class RectangleSelectorView: UIView {
 
     private let guideView = GuideView()
 
-    private let overlayLayer: CAShapeLayer = {
-        let layer = CAShapeLayer()
-        layer.fillColor = UIColor.black.withAlphaComponent(0.5).cgColor
-        return layer
-    }()
-
-    private let overlayMaskLayer: CAShapeLayer  = {
-        let layer = CAShapeLayer()
-        layer.fillColor = UIColor.black.cgColor
-        layer.fillRule = .evenOdd
-        return layer
-    }()
+    private let overlayView = OverlayView()
 
     private var topConstraint: NSLayoutConstraint!
     private var bottomConstraint: NSLayoutConstraint!
@@ -63,18 +52,9 @@ public class RectangleSelectorView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public override func layoutSublayers(of layer: CALayer) {
-        super.layoutSublayers(of: layer)
-
-        CATransaction.withoutAnimation {
-            overlayLayer.frame = self.bounds
-            overlayLayer.path = .init(rect: self.bounds, transform: nil)
-
-            overlayMaskLayer.frame = self.bounds
-            let path = UIBezierPath(rect: self.guideView.frame)
-            path.append(.init(rect: self.bounds))
-            overlayMaskLayer.path = path.cgPath
-        }
+    public override func layoutSubviews() {
+        super.layoutSubviews()
+        overlayView.apply(masked: guideView.frame)
     }
 }
 
@@ -120,9 +100,7 @@ extension RectangleSelectorView {
     }
 
     private func setupViews() {
-        layer.addSublayer(overlayLayer)
-
-        overlayLayer.mask = overlayMaskLayer
+        addSubview(overlayView)
 
         guideView.apply(config.guideConfig)
 
@@ -164,6 +142,7 @@ extension RectangleSelectorView {
     }
 
     private func setupViewConstraints() {
+        overlayView.translatesAutoresizingMaskIntoConstraints = false
         guideView.translatesAutoresizingMaskIntoConstraints = false
         gridView.translatesAutoresizingMaskIntoConstraints = false
 
@@ -191,6 +170,14 @@ extension RectangleSelectorView {
             minimumSize.height = max(minimumSize.height, _minumumSize.height)
             minimumSize.width = max(minimumSize.width, _minumumSize.width)
         }
+
+        // Overlay
+        NSLayoutConstraint.activate([
+            overlayView.topAnchor.constraint(equalTo: topAnchor),
+            overlayView.bottomAnchor.constraint(equalTo: bottomAnchor),
+            overlayView.leftAnchor.constraint(equalTo: leftAnchor),
+            overlayView.rightAnchor.constraint(equalTo: rightAnchor),
+        ])
 
         // Guide threshold Constraints
         NSLayoutConstraint.activate([
