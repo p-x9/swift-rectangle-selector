@@ -172,12 +172,9 @@ extension RectangleSelectorView {
         }
 
         // Overlay
-        NSLayoutConstraint.activate([
-            overlayView.topAnchor.constraint(equalTo: topAnchor),
-            overlayView.bottomAnchor.constraint(equalTo: bottomAnchor),
-            overlayView.leftAnchor.constraint(equalTo: leftAnchor),
-            overlayView.rightAnchor.constraint(equalTo: rightAnchor),
-        ])
+        NSLayoutConstraint.activate(
+            overlayView.constraintEdges(equalTo: self)
+        )
 
         // Guide threshold Constraints
         NSLayoutConstraint.activate([
@@ -192,12 +189,9 @@ extension RectangleSelectorView {
         ])
 
         // Grid Constraints
-        NSLayoutConstraint.activate([
-            gridView.topAnchor.constraint(equalTo: guideView.topAnchor),
-            gridView.bottomAnchor.constraint(equalTo: guideView.bottomAnchor),
-            gridView.leftAnchor.constraint(equalTo: guideView.leftAnchor),
-            gridView.rightAnchor.constraint(equalTo: guideView.rightAnchor),
-        ])
+        NSLayoutConstraint.activate(
+            gridView.constraintEdges(equalTo: guideView)
+        )
 
         // Vertex Handle center
         NSLayoutConstraint.activate([

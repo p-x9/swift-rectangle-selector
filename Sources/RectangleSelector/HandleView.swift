@@ -48,11 +48,13 @@ extension HandleView {
         NSLayoutConstraint.activate([
             heightConstraint,
             widthConstraint,
-            shapeView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            shapeView.centerYAnchor.constraint(equalTo: centerYAnchor),
             heightAnchor.constraint(greaterThanOrEqualTo: shapeView.heightAnchor),
             widthAnchor.constraint(greaterThanOrEqualTo: shapeView.widthAnchor),
         ])
+
+        NSLayoutConstraint.activate(
+            shapeView.constraintCenter(equalTo: self)
+        )
     }
 }
 
