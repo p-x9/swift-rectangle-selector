@@ -3,7 +3,11 @@ import UIKit
 public class RectangleSelectorView: UIView {
 
     var config: Config = .default
-    var aspectMode: AspectMode = .free
+    var aspectMode: AspectMode = .free {
+        didSet {
+            updateMinimumSizeConstraints()
+        }
+    }
     var minimumSize: CGSize?
 
     private let topLeftHandle = HandleView()
@@ -29,16 +33,19 @@ public class RectangleSelectorView: UIView {
     private var leftConstraint: NSLayoutConstraint!
     private var rightConstraint: NSLayoutConstraint!
 
+    private var minimumHeightConstraint: NSLayoutConstraint!
+    private var minimumWidthConstraint: NSLayoutConstraint!
+
     public var defaultMinimumSize: CGSize {
         let minLength = config.vertexHandleConfig.size / 2 * 2 + config.edgeHandleConfig.size
         switch aspectMode {
         case .free:
             return .init(width: minLength, height: minLength)
         case .fixed(let ratio):
-            if ratio > 1 { // width > height
-                return .init(width: minLength * ratio, height: minLength)
+            if ratio < 1 { // width > height
+                return .init(width: minLength / ratio, height: minLength)
             } else { // width <= height
-                return .init(width: minLength, height: minLength / ratio)
+                return .init(width: minLength, height: minLength * ratio)
             }
         }
     }
@@ -176,6 +183,15 @@ extension RectangleSelectorView {
             overlayView.constraintEdges(equalTo: self)
         )
 
+        // Minimum size
+        minimumHeightConstraint = guideView.heightAnchor.constraint(
+            greaterThanOrEqualToConstant: 0
+        )
+        minimumWidthConstraint = guideView.widthAnchor.constraint(
+            greaterThanOrEqualToConstant: 0
+        )
+        updateMinimumSizeConstraints()
+
         // Guide threshold Constraints
         NSLayoutConstraint.activate([
             // Constraints to allow selection only within an area.
@@ -184,8 +200,8 @@ extension RectangleSelectorView {
             guideView.leftAnchor.constraint(greaterThanOrEqualTo: leftAnchor),
             guideView.rightAnchor.constraint(lessThanOrEqualTo: rightAnchor),
             // Constraints for minimum size
-            guideView.heightAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.height),
-            guideView.widthAnchor.constraint(greaterThanOrEqualToConstant: minimumSize.width)
+            minimumHeightConstraint,
+            minimumWidthConstraint
         ])
 
         // Grid Constraints
@@ -249,6 +265,16 @@ extension RectangleSelectorView {
             rightEdgeHandle.topAnchor.constraint(equalTo: topRightHandle.bottomAnchor),
             rightEdgeHandle.bottomAnchor.constraint(equalTo: bottomRightHandle.topAnchor),
         ])
+    }
+
+    private func updateMinimumSizeConstraints() {
+        var minimumSize = self.defaultMinimumSize
+        if let _minumumSize = self.minimumSize {
+            minimumSize.height = max(minimumSize.height, _minumumSize.height)
+            minimumSize.width = max(minimumSize.width, _minumumSize.width)
+        }
+        minimumHeightConstraint.constant = minimumSize.height
+        minimumWidthConstraint.constant = minimumSize.width
     }
 }
 
