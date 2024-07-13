@@ -101,6 +101,23 @@ extension RectangleSelectorView {
 }
 
 extension RectangleSelectorView {
+    func apply(_ config: Config) {
+        guideView.apply(config.guideConfig)
+        gridView.apply(config.gridConfig)
+
+        vertexHandles.forEach {
+            $0.apply(config.handleConfig)
+        }
+
+        centerHandle.apply(config.handleConfig)
+
+        edgeHandles.forEach {
+            $0.apply(config.handleConfig)
+        }
+    }
+}
+
+extension RectangleSelectorView {
     private func setup() {
         setupViews()
         setupViewConstraints()
@@ -119,18 +136,7 @@ extension RectangleSelectorView {
     private func setupViews() {
         addSubview(overlayView)
 
-        guideView.apply(config.guideConfig)
-
-        // apply handle config
-        vertexHandles.forEach {
-            $0.apply(config.handleConfig)
-        }
-
-        centerHandle.apply(config.handleConfig)
-
-        edgeHandles.forEach {
-            $0.apply(config.handleConfig)
-        }
+        apply(config)
 
         centerHandle.isUserInteractionEnabled = false
 
