@@ -22,10 +22,10 @@ struct HandleConfig {
 extension HandleConfig {
     static var `default`: HandleConfig {
         .init(
-            style: .circleAndSquare,
+            style: .edge,
             lineWidth: 3,
             lineColor: .white,
-            size: 60,
+            size: 30,
             color: .clear
         )
     }

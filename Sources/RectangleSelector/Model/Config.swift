@@ -12,13 +12,15 @@ struct Config {
     let handleConfig: HandleConfig
 
     let guideConfig: GuideConfig
+    let gridConfig: GridConfig
 }
 
 extension Config {
     static var `default`: Config {
         .init(
             handleConfig: .default,
-            guideConfig: .default
+            guideConfig: .default,
+            gridConfig: .default
         )
     }
 }

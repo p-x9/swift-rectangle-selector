@@ -18,7 +18,7 @@ struct GuideConfig {
 extension GuideConfig {
     static var `default`: GuideConfig {
         .init(
-            lineWidth: 1,
+            lineWidth: 3,
             lineColor: .white,
             color: .clear
         )
