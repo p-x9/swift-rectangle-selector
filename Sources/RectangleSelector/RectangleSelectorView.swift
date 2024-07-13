@@ -37,7 +37,7 @@ public class RectangleSelectorView: UIView {
     private var minimumWidthConstraint: NSLayoutConstraint!
 
     public var defaultMinimumSize: CGSize {
-        let minLength = config.vertexHandleConfig.size / 2 * 2 + config.edgeHandleConfig.size
+        let minLength = config.handleConfig.size / 2 * 2 + config.handleConfig.size
         switch aspectMode {
         case .free:
             return .init(width: minLength, height: minLength)
@@ -104,6 +104,16 @@ extension RectangleSelectorView {
     private func setup() {
         setupViews()
         setupViewConstraints()
+
+        topEdgeHandle.set(.top)
+        bottomEdgeHandle.set(.bottom)
+        leftEdgeHandle.set(.left)
+        rightEdgeHandle.set(.right)
+        topLeftHandle.set(.topLeft)
+        topRightHandle.set(.topRight)
+        bottomLeftHandle.set(.bottomLeft)
+        bottomRightHandle.set(.bottomRight)
+        centerHandle.set(.center)
     }
 
     private func setupViews() {
@@ -113,13 +123,13 @@ extension RectangleSelectorView {
 
         // apply handle config
         vertexHandles.forEach {
-            $0.apply(config.vertexHandleConfig)
+            $0.apply(config.handleConfig)
         }
 
-        centerHandle.apply(config.edgeHandleConfig)
+        centerHandle.apply(config.handleConfig)
 
         edgeHandles.forEach {
-            $0.apply(config.edgeHandleConfig)
+            $0.apply(config.handleConfig)
         }
 
         centerHandle.isUserInteractionEnabled = false
@@ -225,10 +235,7 @@ extension RectangleSelectorView {
         // Vertex Handle size
         NSLayoutConstraint.activate(
             vertexHandles.map {
-                [
-                    $0.heightAnchor.constraint(equalToConstant: config.edgeHandleConfig.size),
-                    $0.widthAnchor.constraint(equalToConstant: config.edgeHandleConfig.size)
-                ]
+                $0.constraintSize(equalTo: $0.visualView)
             }.flatMap { $0 }
         )
 

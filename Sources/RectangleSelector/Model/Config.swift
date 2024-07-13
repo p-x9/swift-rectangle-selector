@@ -9,8 +9,7 @@
 import Foundation
 
 struct Config {
-    let vertexHandleConfig: HandleConfig
-    let edgeHandleConfig: HandleConfig
+    let handleConfig: HandleConfig
 
     let guideConfig: GuideConfig
 }
@@ -18,8 +17,7 @@ struct Config {
 extension Config {
     static var `default`: Config {
         .init(
-            vertexHandleConfig: .vertexDefault,
-            edgeHandleConfig: .edgeDefault,
+            handleConfig: .default,
             guideConfig: .default
         )
     }

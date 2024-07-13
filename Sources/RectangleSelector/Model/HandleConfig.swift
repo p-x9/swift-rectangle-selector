@@ -9,10 +9,10 @@
 import UIKit
 
 struct HandleConfig {
+    let style: HandleStyle
+
     let lineWidth: CGFloat
     let lineColor: UIColor
-
-    let cornerRadius: CGFloat
 
     let size: CGFloat
 
@@ -20,22 +20,12 @@ struct HandleConfig {
 }
 
 extension HandleConfig {
-    static var vertexDefault: HandleConfig {
+    static var `default`: HandleConfig {
         .init(
-            lineWidth: 1.5,
+            style: .circleAndSquare,
+            lineWidth: 3,
             lineColor: .white,
-            cornerRadius: 10,
-            size: 20,
-            color: .clear
-        )
-    }
-
-    static var edgeDefault: HandleConfig {
-        .init(
-            lineWidth: 1.5,
-            lineColor: .white,
-            cornerRadius: 0,
-            size: 20,
+            size: 60,
             color: .clear
         )
     }

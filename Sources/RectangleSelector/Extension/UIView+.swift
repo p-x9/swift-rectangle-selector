@@ -24,4 +24,11 @@ extension UIView {
             centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: offset.y),
         ]
     }
+
+    func constraintSize(equalTo view: UIView, offset: CGPoint = .zero) -> [NSLayoutConstraint] {
+        [
+            heightAnchor.constraint(equalTo: view.heightAnchor, constant: offset.x),
+            widthAnchor.constraint(equalTo: view.widthAnchor, constant: offset.y),
+        ]
+    }
 }
