@@ -181,13 +181,6 @@ extension RectangleSelectorView {
         // Grid constraints
         NSLayoutConstraint.activate(guideEdgeConstraints)
 
-        // Minimum size
-        var minimumSize = self.defaultMinimumSize
-        if let _minumumSize = self.minimumSize {
-            minimumSize.height = max(minimumSize.height, _minumumSize.height)
-            minimumSize.width = max(minimumSize.width, _minumumSize.width)
-        }
-
         // Overlay
         NSLayoutConstraint.activate(
             overlayView.constraintEdges(equalTo: self)
