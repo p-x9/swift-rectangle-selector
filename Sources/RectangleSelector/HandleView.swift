@@ -9,7 +9,9 @@
 import UIKit
 
 protocol HandleViewDelegate: AnyObject {
+    func handleView(_ view: HandleView, start touch: UITouch)
     func handleView(_ view: HandleView, moved touch: UITouch)
+    func handleView(_ view: HandleView, end touch: UITouch)
 }
 
 final class HandleView: UIView {
@@ -117,6 +119,7 @@ extension HandleView {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         gestureStartPoint = touch.location(in: self)
+        delegate?.handleView(self, start: touch)
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -126,11 +129,11 @@ extension HandleView {
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        delegate?.handleView(self, moved: touch)
+        delegate?.handleView(self, end: touch)
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        delegate?.handleView(self, moved: touch)
+        delegate?.handleView(self, end: touch)
     }
 }

@@ -1,5 +1,17 @@
 import UIKit
 
+public protocol RectangleSelectorViewDelegate: AnyObject {
+    func rectangleSelector(_ selector: RectangleSelectorView, willStartChanging rect: CGRect)
+    func rectangleSelector(_ selector: RectangleSelectorView, didEndChanging rect: CGRect)
+    func rectangleSelector(_ selector: RectangleSelectorView, didUpdate rect: CGRect)
+}
+
+extension RectangleSelectorViewDelegate {
+    func rectangleSelector(_ selector: RectangleSelectorView, willStartChanging rect: CGRect) {}
+    func rectangleSelector(_ selector: RectangleSelectorView, didEndChanging rect: CGRect) {}
+    func rectangleSelector(_ selector: RectangleSelectorView, didUpdate rect: CGRect) {}
+}
+
 public class RectangleSelectorView: UIView {
 
     var config: Config = .default
@@ -9,6 +21,8 @@ public class RectangleSelectorView: UIView {
         }
     }
     var minimumSize: CGSize?
+
+    public weak var delegate: RectangleSelectorViewDelegate?
 
     private let topLeftHandle = HandleView()
     private let topRightHandle = HandleView()
@@ -285,6 +299,14 @@ extension RectangleSelectorView {
 }
 
 extension RectangleSelectorView: HandleViewDelegate {
+    func handleView(_ view: HandleView, start touch: UITouch) {
+        delegate?.rectangleSelector(self, willStartChanging: guideView.frame)
+    }
+
+    func handleView(_ view: HandleView, end touch: UITouch) {
+        delegate?.rectangleSelector(self, didEndChanging: guideView.frame)
+    }
+
     func handleView(_ view: HandleView, moved touch: UITouch) {
         var location = touch.location(in: self)
 
@@ -359,10 +381,20 @@ extension RectangleSelectorView: HandleViewDelegate {
                 break
             }
         }
+
+        delegate?.rectangleSelector(self, didUpdate: guideView.frame)
     }
 }
 
 extension RectangleSelectorView: GuideViewDelegate {
+    func guideView(_ view: GuideView, start touch: UITouch) {
+        delegate?.rectangleSelector(self, willStartChanging: guideView.frame)
+    }
+
+    func guideView(_ view: GuideView, end touch: UITouch) {
+        delegate?.rectangleSelector(self, didEndChanging: guideView.frame)
+    }
+
     func guideView(_ view: GuideView, moved touch: UITouch) {
         var location = touch.location(in: self)
         location.x -= view.gestureStartPoint.x
@@ -398,6 +430,8 @@ extension RectangleSelectorView: GuideViewDelegate {
             leftConstraint.constant += horizontal
             rightConstraint.constant += horizontal
         }
+
+        delegate?.rectangleSelector(self, didUpdate: guideView.frame)
     }
 }
 

@@ -9,7 +9,9 @@
 import UIKit
 
 protocol GuideViewDelegate: AnyObject {
+    func guideView(_ view: GuideView, start touch: UITouch)
     func guideView(_ view: GuideView, moved touch: UITouch)
+    func guideView(_ view: GuideView, end touch: UITouch)
 }
 
 final class GuideView: UIView {
@@ -44,6 +46,7 @@ extension GuideView {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         gestureStartPoint = touch.location(in: self)
+        delegate?.guideView(self, start: touch)
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -53,11 +56,11 @@ extension GuideView {
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        delegate?.guideView(self, moved: touch)
+        delegate?.guideView(self, end: touch)
     }
 
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
-        delegate?.guideView(self, moved: touch)
+        delegate?.guideView(self, end: touch)
     }
 }
