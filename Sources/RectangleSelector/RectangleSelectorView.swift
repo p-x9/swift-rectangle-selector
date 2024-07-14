@@ -137,6 +137,13 @@ extension RectangleSelectorView {
             $0.apply(config.handleConfig)
         }
     }
+
+    public func set(selectedFrameInsets insets: UIEdgeInsets) {
+        topConstraint?.constant = insets.top
+        bottomConstraint?.constant = -insets.bottom
+        leftConstraint?.constant = insets.left
+        rightConstraint?.constant = -insets.right
+    }
 }
 
 extension RectangleSelectorView {
@@ -195,12 +202,6 @@ extension RectangleSelectorView {
         bottomConstraint = guideView.bottomAnchor.constraint(equalTo: bottomAnchor)
         leftConstraint = guideView.leftAnchor.constraint(equalTo: leftAnchor)
         rightConstraint = guideView.rightAnchor.constraint(equalTo: rightAnchor)
-
-        // FIXME: tmp
-        topConstraint.constant = 100
-        bottomConstraint.constant = -100
-        leftConstraint.constant = 50
-        rightConstraint.constant = -50
 
         guideEdgeConstraints.forEach {
             $0.priority = .defaultHigh
