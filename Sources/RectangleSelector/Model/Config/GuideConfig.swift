@@ -8,15 +8,25 @@
 
 import UIKit
 
-struct GuideConfig {
-    let lineWidth: CGFloat
-    let lineColor: UIColor
+public struct GuideConfig {
+    public let lineWidth: CGFloat
+    public let lineColor: UIColor
 
-    let color: UIColor
+    public let color: UIColor
+
+    public init(
+        lineWidth: CGFloat,
+        lineColor: UIColor,
+        color: UIColor
+    ) {
+        self.lineWidth = lineWidth
+        self.lineColor = lineColor
+        self.color = color
+    }
 }
 
 extension GuideConfig {
-    static var `default`: GuideConfig {
+    public static var `default`: GuideConfig {
         .init(
             lineWidth: 3,
             lineColor: .white,

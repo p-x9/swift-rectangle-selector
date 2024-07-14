@@ -8,19 +8,33 @@
 
 import UIKit
 
-struct HandleConfig {
-    let style: HandleStyle
+public struct HandleConfig {
+    public let style: HandleStyle
 
-    let lineWidth: CGFloat
-    let lineColor: UIColor
+    public let lineWidth: CGFloat
+    public let lineColor: UIColor
 
-    let size: CGFloat
+    public let size: CGFloat
 
-    let color: UIColor
+    public let color: UIColor
+
+    public init(
+        style: HandleStyle,
+        lineWidth: CGFloat,
+        lineColor: UIColor,
+        size: CGFloat,
+        color: UIColor
+    ) {
+        self.style = style
+        self.lineWidth = lineWidth
+        self.lineColor = lineColor
+        self.size = size
+        self.color = color
+    }
 }
 
 extension HandleConfig {
-    static var `default`: HandleConfig {
+    public static var `default`: HandleConfig {
         .init(
             style: .edge,
             lineWidth: 3,

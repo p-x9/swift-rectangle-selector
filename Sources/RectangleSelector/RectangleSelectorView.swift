@@ -12,15 +12,23 @@ extension RectangleSelectorViewDelegate {
     func rectangleSelector(_ selector: RectangleSelectorView, didUpdate rect: CGRect) {}
 }
 
-public class RectangleSelectorView: UIView {
+public final class RectangleSelectorView: UIView {
 
-    var config: Config = .default
-    var aspectMode: AspectMode = .free {
+    public private(set) var config: Config = .default
+    public var aspectMode: AspectMode = .free {
         didSet {
             updateMinimumSizeConstraints()
         }
     }
-    var minimumSize: CGSize?
+    public var minimumSize: CGSize? {
+        didSet {
+            updateMinimumSizeConstraints()
+        }
+    }
+
+    public var selectedRect: CGRect {
+        guideView.frame
+    }
 
     public weak var delegate: RectangleSelectorViewDelegate?
 
@@ -115,7 +123,7 @@ extension RectangleSelectorView {
 }
 
 extension RectangleSelectorView {
-    func apply(_ config: Config) {
+    public func apply(_ config: Config) {
         guideView.apply(config.guideConfig)
         gridView.apply(config.gridConfig)
 

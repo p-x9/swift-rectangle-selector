@@ -8,15 +8,25 @@
 
 import Foundation
 
-struct Config {
-    let handleConfig: HandleConfig
+public struct Config {
+    public let handleConfig: HandleConfig
 
-    let guideConfig: GuideConfig
-    let gridConfig: GridConfig
+    public let guideConfig: GuideConfig
+    public let gridConfig: GridConfig
+
+    public init(
+        handleConfig: HandleConfig,
+        guideConfig: GuideConfig,
+        gridConfig: GridConfig
+    ) {
+        self.handleConfig = handleConfig
+        self.guideConfig = guideConfig
+        self.gridConfig = gridConfig
+    }
 }
 
 extension Config {
-    static var `default`: Config {
+    public static var `default`: Config {
         .init(
             handleConfig: .default,
             guideConfig: .default,

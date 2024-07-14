@@ -8,15 +8,27 @@
 
 import UIKit
 
-struct GridConfig {
-    let numberOfRows: Int
-    let numberOfColmuns: Int
-    let lineWidth: CGFloat
-    let lineColor: UIColor
+public struct GridConfig {
+    public let numberOfRows: Int
+    public let numberOfColmuns: Int
+    public let lineWidth: CGFloat
+    public let lineColor: UIColor
+
+    public init(
+        numberOfRows: Int,
+        numberOfColmuns: Int,
+        lineWidth: CGFloat,
+        lineColor: UIColor
+    ) {
+        self.numberOfRows = numberOfRows
+        self.numberOfColmuns = numberOfColmuns
+        self.lineWidth = lineWidth
+        self.lineColor = lineColor
+    }
 }
 
 extension GridConfig {
-    static var `default`: Self {
+    public static var `default`: Self {
         .init(
             numberOfRows: 3,
             numberOfColmuns: 3,

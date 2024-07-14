@@ -8,8 +8,8 @@
 
 import UIKit
 
-class GridView: UIView {
-    public private(set) var config: GridConfig = .default
+final class GridView: UIView {
+    private(set) var config: GridConfig = .default
 
     private let horizontalLineLayer = CALayer()
     private let verticalLineLayer = CALayer()
