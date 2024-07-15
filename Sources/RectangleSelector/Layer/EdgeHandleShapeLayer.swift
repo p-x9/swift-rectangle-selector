@@ -151,29 +151,30 @@ fileprivate extension HandlePosition {
     }
 }
 
-#Preview {
-    let size = CGSize(width: 200, height: 200)
-
-    let v = UIView()
-    let layer = EdgeHandleShapeLayer()
-    layer.frame = .init(
-        origin: .init(x: 100, y: 100),
-        size: size
-    )
-    layer.borderWidth = 1
-    layer.apply(fillColor: UIColor.red.cgColor)
-    layer.apply(lineWidth: 10)
-    layer.apply(position: .center)
-
-    // center
-    let sub = CALayer()
-    sub.borderWidth = 1
-    sub.frame = .init(
-        origin: .zero,
-        size: .init(width: size.width / 2, height: size.height / 2)
-    )
-    layer.addSublayer(sub)
-
-    v.layer.addSublayer(layer)
-    return v
-}
+//@available(iOS 17.0, *)
+//#Preview {
+//    let size = CGSize(width: 200, height: 200)
+//
+//    let v = UIView()
+//    let layer = EdgeHandleShapeLayer()
+//    layer.frame = .init(
+//        origin: .init(x: 100, y: 100),
+//        size: size
+//    )
+//    layer.borderWidth = 1
+//    layer.apply(fillColor: UIColor.red.cgColor)
+//    layer.apply(lineWidth: 10)
+//    layer.apply(position: .center)
+//
+//    // center
+//    let sub = CALayer()
+//    sub.borderWidth = 1
+//    sub.frame = .init(
+//        origin: .zero,
+//        size: .init(width: size.width / 2, height: size.height / 2)
+//    )
+//    layer.addSublayer(sub)
+//
+//    v.layer.addSublayer(layer)
+//    return v
+//}
