@@ -59,7 +59,10 @@ public final class RectangleSelectorView: UIView {
     private var minimumWidthConstraint: NSLayoutConstraint!
 
     public var defaultMinimumSize: CGSize {
-        let minLength = config.handleConfig.size / 2 * 2 + config.handleConfig.size
+        let minLength = max(
+            config.handleConfigs.vertex.size / 2 * 2 + config.handleConfigs.edge.size,
+            config.handleConfigs.edge.size / 2 * 2 + config.handleConfigs.center.size
+        )
         switch aspectMode {
         case .free:
             return .init(width: minLength, height: minLength)
@@ -129,13 +132,13 @@ extension RectangleSelectorView {
         gridView.apply(config.gridConfig)
 
         vertexHandles.forEach {
-            $0.apply(config.handleConfig)
+            $0.apply(config.handleConfigs.vertex)
         }
 
-        centerHandle.apply(config.handleConfig)
+        centerHandle.apply(config.handleConfigs.center)
 
         edgeHandles.forEach {
-            $0.apply(config.handleConfig)
+            $0.apply(config.handleConfigs.edge)
         }
     }
 
