@@ -17,6 +17,12 @@ public final class RectangleSelectorView: UIView {
     public private(set) var config: Config = .default
     public var aspectMode: AspectMode = .free {
         didSet {
+            switch aspectMode {
+            case .free:
+                edgeHandles.forEach { $0.isHidden = false }
+            case .fixed:
+                edgeHandles.forEach { $0.isHidden = true }
+            }
             updateMinimumSizeConstraints()
         }
     }
