@@ -51,9 +51,9 @@ public final class RectangleSelectorView: UIView {
     private let overlayView = OverlayView()
 
     private var topConstraint: NSLayoutConstraint!
-    private var bottomConstraint: NSLayoutConstraint!
+    private var heightConstraint: NSLayoutConstraint!
     private var leftConstraint: NSLayoutConstraint!
-    private var rightConstraint: NSLayoutConstraint!
+    private var widthConstraint: NSLayoutConstraint!
 
     private var minimumHeightConstraint: NSLayoutConstraint!
     private var minimumWidthConstraint: NSLayoutConstraint!
@@ -79,7 +79,7 @@ public final class RectangleSelectorView: UIView {
         super.init(frame: frame)
         setup()
     }
-    
+
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -100,7 +100,7 @@ extension RectangleSelectorView {
             bottomRightHandle,
         ]
     }
-    
+
     var edgeHandles: [HandleView] {
         [
             topEdgeHandle,
@@ -119,9 +119,9 @@ extension RectangleSelectorView {
     var guideEdgeConstraints: [NSLayoutConstraint] {
         [
             topConstraint,
-            bottomConstraint,
+            heightConstraint,
             leftConstraint,
-            rightConstraint
+            widthConstraint
         ]
     }
 }
@@ -142,11 +142,11 @@ extension RectangleSelectorView {
         }
     }
 
-    public func set(selectedFrameInsets insets: UIEdgeInsets) {
-        topConstraint?.constant = insets.top
-        bottomConstraint?.constant = -insets.bottom
-        leftConstraint?.constant = insets.left
-        rightConstraint?.constant = -insets.right
+    public func set(selectedFrame frame: CGRect) {
+        topConstraint?.constant = frame.minY
+        heightConstraint?.constant = frame.height
+        leftConstraint?.constant = frame.minX
+        widthConstraint?.constant = frame.width
     }
 
     public func show(for view: UIView) {
@@ -211,9 +211,9 @@ extension RectangleSelectorView {
         gridView.translatesAutoresizingMaskIntoConstraints = false
 
         topConstraint = guideView.topAnchor.constraint(equalTo: topAnchor)
-        bottomConstraint = guideView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        heightConstraint = guideView.heightAnchor.constraint(equalToConstant: 0)
         leftConstraint = guideView.leftAnchor.constraint(equalTo: leftAnchor)
-        rightConstraint = guideView.rightAnchor.constraint(equalTo: rightAnchor)
+        widthConstraint = guideView.widthAnchor.constraint(equalToConstant: 0)
 
         guideEdgeConstraints.forEach {
             $0.priority = .defaultHigh
@@ -339,65 +339,118 @@ extension RectangleSelectorView: HandleViewDelegate {
         let horizontal = location.x + view.frame.width / 2
         let vertical = location.y + view.frame.height / 2
 
+        let minimumSize = minimumSize ?? defaultMinimumSize
+
         switch aspectMode {
         case .free:
-            switch view {
-            case topEdgeHandle:
-                topConstraint.constant = vertical
-            case bottomEdgeHandle:
-                bottomConstraint.constant = vertical - self.frame.size.height
-            case leftEdgeHandle:
-                leftConstraint.constant = horizontal
-            case rightEdgeHandle:
-                rightConstraint.constant = horizontal - self.frame.size.width
-            case centerHandle:
-                break
-            case topLeftHandle:
-                topConstraint.constant = vertical
-                leftConstraint.constant = horizontal
-            case topRightHandle:
-                topConstraint.constant = vertical
-                rightConstraint.constant = horizontal - self.frame.size.width
-            case bottomLeftHandle:
-                bottomConstraint.constant = vertical - self.frame.size.height
-                leftConstraint.constant = horizontal
-            case bottomRightHandle:
-                bottomConstraint.constant = vertical - self.frame.size.height
-                rightConstraint.constant = horizontal - self.frame.size.width
-            default:
-                break
+            if [topEdgeHandle, topLeftHandle, topRightHandle].contains(view) {
+                let diff = (vertical - topConstraint.constant)
+                if heightConstraint.constant - diff < minimumSize.height {
+                    topConstraint.constant += heightConstraint.constant - minimumSize.height
+                    heightConstraint.constant = minimumSize.height
+                } else if vertical < 0 {
+                    heightConstraint.constant += topConstraint.constant
+                    topConstraint.constant = 0
+                } else {
+                    heightConstraint.constant -= diff
+                    topConstraint.constant = vertical
+                }
+            }
+
+            if [bottomEdgeHandle, bottomLeftHandle, bottomRightHandle].contains(view) {
+                let diff = vertical - topConstraint.constant - heightConstraint.constant
+                if heightConstraint.constant + diff < minimumSize.height {
+                    heightConstraint.constant = minimumSize.height
+                } else if topConstraint.constant + heightConstraint.constant + diff > frame.height {
+                    heightConstraint.constant = frame.height - topConstraint.constant
+                } else {
+                    heightConstraint.constant += diff
+                }
+            }
+
+            if [leftEdgeHandle, topLeftHandle, bottomLeftHandle].contains(view) {
+                let diff = (horizontal - leftConstraint.constant)
+                if widthConstraint.constant - diff < minimumSize.width {
+                    leftConstraint.constant += widthConstraint.constant - minimumSize.width
+                    widthConstraint.constant = minimumSize.width
+                } else if horizontal < 0 {
+                    widthConstraint.constant += leftConstraint.constant
+                    leftConstraint.constant = 0
+                } else {
+                    widthConstraint.constant -= diff
+                    leftConstraint.constant = horizontal
+                }
+            }
+
+            if [rightEdgeHandle, topRightHandle, bottomRightHandle].contains(view) {
+                let diff = horizontal - leftConstraint.constant - widthConstraint.constant
+                if widthConstraint.constant + diff < minimumSize.width {
+                    widthConstraint.constant = minimumSize.width
+                } else if leftConstraint.constant + widthConstraint.constant + diff > frame.width {
+                    widthConstraint.constant = frame.width - leftConstraint.constant
+                } else {
+                    widthConstraint.constant += diff
+                }
             }
 
         case let .fixed(aspectRatio):
             switch view {
             case topLeftHandle:
+                let diffX = (horizontal - leftConstraint.constant)
+                let diffY = (vertical - topConstraint.constant)
+                let max: CGSize = .init(
+                    width: guideView.frame.maxX,
+                    height: guideView.frame.maxY
+                )
                 let size = CGSize(
-                    width: frame.width - horizontal + rightConstraint.constant,
-                    height: frame.height - vertical + bottomConstraint.constant
-                ).adjusted(with: aspectRatio)
-                topConstraint.constant = frame.height - size.height + bottomConstraint.constant
-                leftConstraint.constant = frame.width - size.width + rightConstraint.constant
+                    width: widthConstraint.constant - diffX,
+                    height: heightConstraint.constant - diffY
+                ).adjusted(        withAspect: aspectRatio, max: max, min: minimumSize)
+                topConstraint.constant -= size.height - heightConstraint.constant
+                leftConstraint.constant -= size.width - widthConstraint.constant
+                widthConstraint.constant = size.width
+                heightConstraint.constant = size.height
             case topRightHandle:
+                let diffX = (horizontal - leftConstraint.constant - widthConstraint.constant)
+                let diffY = (vertical - topConstraint.constant)
+                let max: CGSize = .init(
+                    width: frame.width - guideView.frame.minX,
+                    height: guideView.frame.maxY
+                )
                 let size = CGSize(
-                    width: frame.width - leftConstraint.constant + horizontal - frame.size.width,
-                    height: frame.height - vertical + bottomConstraint.constant
-                ).adjusted(with: aspectRatio)
-                topConstraint.constant = frame.height - size.height + bottomConstraint.constant
-                rightConstraint.constant = -(frame.width - size.width - leftConstraint.constant)
+                    width: widthConstraint.constant + diffX,
+                    height: heightConstraint.constant - diffY
+                ).adjusted(        withAspect: aspectRatio, max: max, min: minimumSize)
+                topConstraint.constant -= size.height - heightConstraint.constant
+                widthConstraint.constant = size.width
+                heightConstraint.constant = size.height
             case bottomLeftHandle:
+                let diffX = (horizontal - leftConstraint.constant)
+                let diffY = (vertical - topConstraint.constant - heightConstraint.constant)
+                let max: CGSize = .init(
+                    width: guideView.frame.maxX,
+                    height: frame.height - guideView.frame.minY
+                )
                 let size = CGSize(
-                    width: frame.width - horizontal + rightConstraint.constant,
-                    height: frame.height - topConstraint.constant + vertical - frame.size.height
-                ).adjusted(with: aspectRatio)
-                bottomConstraint.constant = -(frame.height - size.height - topConstraint.constant)
-                leftConstraint.constant = frame.width - size.width + rightConstraint.constant
+                    width: widthConstraint.constant - diffX,
+                    height: heightConstraint.constant + diffY
+                ).adjusted(        withAspect: aspectRatio, max: max, min: minimumSize)
+                leftConstraint.constant -= size.width - widthConstraint.constant
+                widthConstraint.constant = size.width
+                heightConstraint.constant = size.height
             case bottomRightHandle:
+                let diffX = (horizontal - leftConstraint.constant - widthConstraint.constant)
+                let diffY = (vertical - topConstraint.constant - heightConstraint.constant)
+                let max: CGSize = .init(
+                    width: frame.width - guideView.frame.minX,
+                    height: frame.height - guideView.frame.minY
+                )
                 let size = CGSize(
-                    width: frame.width - leftConstraint.constant + horizontal - frame.size.width,
-                    height: frame.height - topConstraint.constant + vertical - frame.size.height
-                ).adjusted(with: aspectRatio)
-                bottomConstraint.constant = -(frame.height - size.height - topConstraint.constant)
-                rightConstraint.constant = -(frame.width - size.width - leftConstraint.constant)
+                    width: widthConstraint.constant + diffX,
+                    height: heightConstraint.constant + diffY
+                ).adjusted(        withAspect: aspectRatio, max: max, min: minimumSize)
+                widthConstraint.constant = size.width
+                heightConstraint.constant = size.height
             default:
                 break
             }
@@ -424,32 +477,35 @@ extension RectangleSelectorView: GuideViewDelegate {
         let horizontal = location.x - view.frame.minX
         let vertical = location.y - view.frame.minY
 
-        let locationInGuide = touch.location(in: view)
+        var shouldUpdateStartPointX = false
+        var shouldUpdateStartPointY = false
 
         if topConstraint.constant + vertical < 0 {
-            bottomConstraint.constant -= topConstraint.constant
             topConstraint.constant = 0
-            view.gestureStartPoint.y = locationInGuide.y
-        } else if bottomConstraint.constant + vertical > 0 {
-            topConstraint.constant -= bottomConstraint.constant
-            bottomConstraint.constant = 0
-            view.gestureStartPoint.y = locationInGuide.y
+            shouldUpdateStartPointY = true
+        } else if topConstraint.constant + vertical + heightConstraint.constant >= frame.height {
+            topConstraint.constant = frame.height - heightConstraint.constant
+            shouldUpdateStartPointY = true
         } else {
             topConstraint.constant += vertical
-            bottomConstraint.constant += vertical
         }
 
         if leftConstraint.constant + horizontal < 0 {
-            rightConstraint.constant -= leftConstraint.constant
             leftConstraint.constant = 0
-            view.gestureStartPoint.x = locationInGuide.x
-        } else if rightConstraint.constant + horizontal > 0 {
-            leftConstraint.constant -= rightConstraint.constant
-            rightConstraint.constant = 0
-            view.gestureStartPoint.x = locationInGuide.x
+            shouldUpdateStartPointX = true
+        } else if leftConstraint.constant + horizontal + widthConstraint.constant >= frame.width {
+            leftConstraint.constant = frame.width - widthConstraint.constant
+            shouldUpdateStartPointX = true
         } else {
             leftConstraint.constant += horizontal
-            rightConstraint.constant += horizontal
+        }
+
+        if shouldUpdateStartPointX || shouldUpdateStartPointY {
+            setNeedsLayout()
+            layoutIfNeeded()
+            let locationInGuide = touch.location(in: view)
+            if shouldUpdateStartPointX { view.gestureStartPoint.x = locationInGuide.x }
+            if shouldUpdateStartPointY { view.gestureStartPoint.y = locationInGuide.y }
         }
 
         delegate?.rectangleSelector(self, didUpdate: guideView.frame)
@@ -458,7 +514,7 @@ extension RectangleSelectorView: GuideViewDelegate {
 
 private extension CGSize {
     func adjusted(
-        with aspectRatio: CGFloat
+        withAspect aspectRatio: CGFloat
     ) -> CGSize {
         var width = width
         var height = height
@@ -469,6 +525,19 @@ private extension CGSize {
         }
 
         return .init(width: width, height: height)
+    }
+
+    func adjusted(
+        withAspect aspectRatio: CGFloat,
+        max: CGSize,
+        min: CGSize
+    ) -> CGSize {
+        var size = adjusted(withAspect: aspectRatio)
+        if size.height > max.height { size.height = max.height }
+        if size.width > max.width { size.width = max.width }
+        if size.height < min.height { size.height = min.height }
+        if size.width < min.width { size.width = min.width }
+        return size.adjusted(withAspect: aspectRatio)
     }
 }
 
@@ -483,7 +552,6 @@ private extension CGSize {
 //        v.widthAnchor.constraint(
 //            equalToConstant: UIScreen.main.bounds.width
 //        )
-//    ])
 //
 //    return v
 //}
