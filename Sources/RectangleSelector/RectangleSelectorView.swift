@@ -95,6 +95,18 @@ public final class RectangleSelectorView: UIView {
         super.layoutSubviews()
         overlayView.apply(masked: guideView.frame)
     }
+
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        if let view = super.hitTest(point, with: event) {
+            return view
+        }
+        for handle in handles {
+            if handle.frame.contains(point) {
+                return handle
+            }
+        }
+        return nil
+    }
 }
 
 extension RectangleSelectorView {
