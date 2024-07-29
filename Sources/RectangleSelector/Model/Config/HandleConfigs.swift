@@ -9,9 +9,9 @@
 import Foundation
 
 public struct HandleConfigs {
-    public let vertex: HandleConfig
-    public let edge: HandleConfig
-    public let center: HandleConfig
+    public var vertex: HandleConfig
+    public var edge: HandleConfig
+    public var center: HandleConfig
 
     public init(
         vertex: HandleConfig,

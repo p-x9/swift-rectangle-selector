@@ -9,10 +9,10 @@
 import Foundation
 
 public struct Config {
-    public let handleConfigs: HandleConfigs
+    public var handleConfigs: HandleConfigs
 
-    public let guideConfig: GuideConfig
-    public let gridConfig: GridConfig
+    public var guideConfig: GuideConfig
+    public var gridConfig: GridConfig
 
     public init(
         handleConfigs: HandleConfigs,

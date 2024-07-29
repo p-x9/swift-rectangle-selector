@@ -9,14 +9,14 @@
 import UIKit
 
 public struct HandleConfig {
-    public let style: HandleStyle
+    public var style: HandleStyle
 
-    public let lineWidth: CGFloat
-    public let lineColor: UIColor
+    public var lineWidth: CGFloat
+    public var lineColor: UIColor
 
-    public let size: CGFloat
+    public var size: CGFloat
 
-    public let color: UIColor
+    public var color: UIColor
 
     public init(
         style: HandleStyle,

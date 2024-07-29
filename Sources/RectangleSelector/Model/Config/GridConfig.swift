@@ -9,10 +9,10 @@
 import UIKit
 
 public struct GridConfig {
-    public let numberOfRows: Int
-    public let numberOfColmuns: Int
-    public let lineWidth: CGFloat
-    public let lineColor: UIColor
+    public var numberOfRows: Int
+    public var numberOfColmuns: Int
+    public var lineWidth: CGFloat
+    public var lineColor: UIColor
 
     public init(
         numberOfRows: Int,

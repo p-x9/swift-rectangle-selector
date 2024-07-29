@@ -9,10 +9,10 @@
 import UIKit
 
 public struct GuideConfig {
-    public let lineWidth: CGFloat
-    public let lineColor: UIColor
+    public var lineWidth: CGFloat
+    public var lineColor: UIColor
 
-    public let color: UIColor
+    public var color: UIColor
 
     public init(
         lineWidth: CGFloat,
