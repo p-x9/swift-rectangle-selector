@@ -168,7 +168,11 @@ extension RectangleSelectorView {
     }
 
     public func show(for view: UIView) {
-        view.addSubview(self)
+        if let superview = view.superview {
+            superview.addSubview(self)
+        } else {
+            view.addSubview(self)
+        }
         translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate(
             self.constraintEdges(equalTo: view)
