@@ -178,6 +178,10 @@ extension RectangleSelectorView {
             self.constraintEdges(equalTo: view)
         )
     }
+
+    public func dismiss() {
+        removeFromSuperview()
+    }
 }
 
 extension RectangleSelectorView {
