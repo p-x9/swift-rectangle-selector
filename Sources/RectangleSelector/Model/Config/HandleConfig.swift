@@ -44,3 +44,13 @@ extension HandleConfig {
         )
     }
 }
+
+extension HandleConfig {
+    public static let dummy: Self = .init(
+        style: .edge,
+        lineWidth: 0,
+        lineColor: .clear,
+        size: 0,
+        color: .clear
+    )
+}

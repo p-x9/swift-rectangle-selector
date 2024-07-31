@@ -37,3 +37,12 @@ extension GridConfig {
         )
     }
 }
+
+extension GridConfig {
+    public static let dummy: Self = .init(
+        numberOfRows: 0,
+        numberOfColmuns: 0,
+        lineWidth: 0,
+        lineColor: .clear
+    )
+}
