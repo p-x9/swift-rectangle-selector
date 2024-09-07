@@ -34,3 +34,12 @@ extension GuideConfig {
         )
     }
 }
+
+extension GuideConfig {
+    var disabled: Self {
+        var new = self
+        new.lineColor = new.lineColor.disabled()
+        new.color = new.color.disabled()
+        return new
+    }
+}

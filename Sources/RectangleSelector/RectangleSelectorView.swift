@@ -84,6 +84,7 @@ public final class RectangleSelectorView: UIControl {
     public override var isEnabled: Bool {
         didSet {
             hideHandles(!isEnabled)
+            _apply(isEnabled ? config : config.disabled)
         }
     }
 
@@ -153,7 +154,10 @@ extension RectangleSelectorView {
 extension RectangleSelectorView {
     public func apply(_ config: Config) {
         self.config = config
+        _apply(config)
+    }
 
+    private func _apply(_ config: Config) {
         guideView.apply(config.guideConfig)
         gridView.apply(config.gridConfig)
 

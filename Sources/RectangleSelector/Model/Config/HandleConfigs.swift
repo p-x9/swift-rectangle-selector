@@ -31,3 +31,13 @@ public struct HandleConfigs {
         )
     }
 }
+
+extension HandleConfigs {
+    var disabled: Self {
+        .init(
+            vertex: vertex.disabled,
+            edge: edge.disabled,
+            center: center.disabled
+        )
+    }
+}
