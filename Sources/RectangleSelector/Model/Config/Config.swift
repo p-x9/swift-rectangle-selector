@@ -34,3 +34,13 @@ extension Config {
         )
     }
 }
+
+extension Config {
+    var disabled: Self {
+        .init(
+            handleConfigs: handleConfigs.disabled,
+            guideConfig: guideConfig.disabled,
+            gridConfig: gridConfig.disabled
+        )
+    }
+}

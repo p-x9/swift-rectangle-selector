@@ -46,3 +46,11 @@ extension GridConfig {
         lineColor: .clear
     )
 }
+
+extension GridConfig {
+    var disabled: Self {
+        var new = self
+        new.lineColor = new.lineColor.disabled()
+        return new
+    }
+}

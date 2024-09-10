@@ -12,8 +12,8 @@ extension RectangleSelectorViewDelegate {
     public func rectangleSelector(_ selector: RectangleSelectorView, didUpdate rect: CGRect) {}
 }
 
-public final class RectangleSelectorView: UIView {
-
+public final class RectangleSelectorView: UIControl {
+    
     public private(set) var config: Config = .default
     public var aspectMode: AspectMode = .free {
         didSet {
@@ -31,39 +31,39 @@ public final class RectangleSelectorView: UIView {
             updateMinimumSizeConstraints()
         }
     }
-
+    
     public var selectedRect: CGRect {
         guideView.frame
     }
-
+    
     public weak var delegate: RectangleSelectorViewDelegate?
-
+    
     private let topLeftHandle = HandleView()
     private let topRightHandle = HandleView()
     private let bottomLeftHandle = HandleView()
     private let bottomRightHandle = HandleView()
-
+    
     private let centerHandle = HandleView()
-
+    
     private let topEdgeHandle = HandleView()
     private let bottomEdgeHandle = HandleView()
     private let leftEdgeHandle = HandleView()
     private let rightEdgeHandle = HandleView()
-
+    
     private let gridView = GridView()
-
+    
     private let guideView = GuideView()
-
+    
     private let overlayView = OverlayView()
-
+    
     private var topConstraint: NSLayoutConstraint!
     private var heightConstraint: NSLayoutConstraint!
     private var leftConstraint: NSLayoutConstraint!
     private var widthConstraint: NSLayoutConstraint!
-
+    
     private var minimumHeightConstraint: NSLayoutConstraint!
     private var minimumWidthConstraint: NSLayoutConstraint!
-
+    
     public var defaultMinimumSize: CGSize {
         let minLength = max(
             config.handleConfigs.vertex.size / 2 * 2 + config.handleConfigs.edge.size,
@@ -80,22 +80,29 @@ public final class RectangleSelectorView: UIView {
             }
         }
     }
-
+    
+    public override var isEnabled: Bool {
+        didSet {
+            hideHandles(!isEnabled)
+            _apply(isEnabled ? config : config.disabled)
+        }
+    }
+    
     public override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
-
+    
     @available(*, unavailable)
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     public override func layoutSubviews() {
         super.layoutSubviews()
         overlayView.apply(masked: guideView.frame)
     }
-
+    
     public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if let view = super.hitTest(point, with: event) {
             return view
@@ -118,7 +125,7 @@ extension RectangleSelectorView {
             bottomRightHandle,
         ]
     }
-
+    
     var edgeHandles: [HandleView] {
         [
             topEdgeHandle,
@@ -127,13 +134,13 @@ extension RectangleSelectorView {
             rightEdgeHandle,
         ]
     }
-
+    
     var handles: [HandleView] {
         vertexHandles +
         [centerHandle] +
         edgeHandles
     }
-
+    
     var guideEdgeConstraints: [NSLayoutConstraint] {
         [
             topConstraint,
@@ -146,27 +153,32 @@ extension RectangleSelectorView {
 
 extension RectangleSelectorView {
     public func apply(_ config: Config) {
+        self.config = config
+        _apply(config)
+    }
+    
+    private func _apply(_ config: Config) {
         guideView.apply(config.guideConfig)
         gridView.apply(config.gridConfig)
-
+        
         vertexHandles.forEach {
             $0.apply(config.handleConfigs.vertex)
         }
-
+        
         centerHandle.apply(config.handleConfigs.center)
-
+        
         edgeHandles.forEach {
             $0.apply(config.handleConfigs.edge)
         }
     }
-
+    
     public func set(selectedFrame frame: CGRect) {
         topConstraint?.constant = frame.minY
         heightConstraint?.constant = frame.height
         leftConstraint?.constant = frame.minX
         widthConstraint?.constant = frame.width
     }
-
+    
     public func show(for view: UIView) {
         if let superview = view.superview {
             superview.addSubview(self)
@@ -178,7 +190,7 @@ extension RectangleSelectorView {
             self.constraintEdges(equalTo: view)
         )
     }
-
+    
     public func dismiss() {
         removeFromSuperview()
     }
@@ -188,7 +200,7 @@ extension RectangleSelectorView {
     private func setup() {
         setupViews()
         setupViewConstraints()
-
+        
         topEdgeHandle.set(.top)
         bottomEdgeHandle.set(.bottom)
         leftEdgeHandle.set(.left)
@@ -199,60 +211,60 @@ extension RectangleSelectorView {
         bottomRightHandle.set(.bottomRight)
         centerHandle.set(.center)
     }
-
+    
     private func setupViews() {
         addSubview(overlayView)
-
+        
         apply(config)
-
+        
         centerHandle.isUserInteractionEnabled = false
-
+        
         // set delegates
         guideView.delegate = self
         handles.forEach {
             $0.delegate = self
         }
-
+        
         // add subview
         addSubview(guideView)
-
+        
         guideView.addSubview(gridView)
-
+        
         addSubview(topLeftHandle)
         addSubview(topRightHandle)
         addSubview(bottomLeftHandle)
         addSubview(bottomRightHandle)
-
+        
         addSubview(centerHandle)
-
+        
         addSubview(topEdgeHandle)
         addSubview(bottomEdgeHandle)
         addSubview(leftEdgeHandle)
         addSubview(rightEdgeHandle)
     }
-
+    
     private func setupViewConstraints() {
         overlayView.translatesAutoresizingMaskIntoConstraints = false
         guideView.translatesAutoresizingMaskIntoConstraints = false
         gridView.translatesAutoresizingMaskIntoConstraints = false
-
+        
         topConstraint = guideView.topAnchor.constraint(equalTo: topAnchor)
         heightConstraint = guideView.heightAnchor.constraint(equalToConstant: 0)
         leftConstraint = guideView.leftAnchor.constraint(equalTo: leftAnchor)
         widthConstraint = guideView.widthAnchor.constraint(equalToConstant: 0)
-
+        
         guideEdgeConstraints.forEach {
             $0.priority = .defaultHigh
         }
-
+        
         // Grid constraints
         NSLayoutConstraint.activate(guideEdgeConstraints)
-
+        
         // Overlay
         NSLayoutConstraint.activate(
             overlayView.constraintEdges(equalTo: self)
         )
-
+        
         // Minimum size
         minimumHeightConstraint = guideView.heightAnchor.constraint(
             greaterThanOrEqualToConstant: 0
@@ -261,7 +273,7 @@ extension RectangleSelectorView {
             greaterThanOrEqualToConstant: 0
         )
         updateMinimumSizeConstraints()
-
+        
         // Guide threshold Constraints
         NSLayoutConstraint.activate([
             // Constraints to allow selection only within an area.
@@ -273,67 +285,67 @@ extension RectangleSelectorView {
             minimumHeightConstraint,
             minimumWidthConstraint
         ])
-
+        
         // Grid Constraints
         NSLayoutConstraint.activate(
             gridView.constraintEdges(equalTo: guideView)
         )
-
+        
         // Vertex Handle center
         NSLayoutConstraint.activate([
             topLeftHandle.centerXAnchor.constraint(equalTo: guideView.leftAnchor),
             topLeftHandle.centerYAnchor.constraint(equalTo: guideView.topAnchor),
             topRightHandle.centerXAnchor.constraint(equalTo: guideView.rightAnchor),
             topRightHandle.centerYAnchor.constraint(equalTo: guideView.topAnchor),
-
+            
             bottomLeftHandle.centerXAnchor.constraint(equalTo: guideView.leftAnchor),
             bottomLeftHandle.centerYAnchor.constraint(equalTo: guideView.bottomAnchor),
             bottomRightHandle.centerXAnchor.constraint(equalTo: guideView.rightAnchor),
             bottomRightHandle.centerYAnchor.constraint(equalTo: guideView.bottomAnchor),
         ])
-
+        
         // Vertex Handle size
         NSLayoutConstraint.activate(
             vertexHandles.map {
                 $0.constraintSize(equalTo: $0.visualView)
             }.flatMap { $0 }
         )
-
+        
         // Center Handle
         NSLayoutConstraint.activate([
             centerHandle.centerXAnchor.constraint(equalTo: guideView.centerXAnchor),
             centerHandle.centerYAnchor.constraint(equalTo: guideView.centerYAnchor),
         ])
-
+        
         // Edge Handle center
         NSLayoutConstraint.activate([
             topEdgeHandle.centerXAnchor.constraint(equalTo: guideView.centerXAnchor),
             topEdgeHandle.centerYAnchor.constraint(equalTo: guideView.topAnchor),
             bottomEdgeHandle.centerXAnchor.constraint(equalTo: guideView.centerXAnchor),
             bottomEdgeHandle.centerYAnchor.constraint(equalTo: guideView.bottomAnchor),
-
+            
             leftEdgeHandle.centerXAnchor.constraint(equalTo: guideView.leftAnchor),
             leftEdgeHandle.centerYAnchor.constraint(equalTo: guideView.centerYAnchor),
             rightEdgeHandle.centerXAnchor.constraint(equalTo: guideView.rightAnchor),
             rightEdgeHandle.centerYAnchor.constraint(equalTo: guideView.centerYAnchor),
         ])
-
+        
         // Edge Handle size
         NSLayoutConstraint.activate([
             topEdgeHandle.leftAnchor.constraint(equalTo: topLeftHandle.rightAnchor),
             topEdgeHandle.rightAnchor.constraint(equalTo: topRightHandle.leftAnchor),
-
+            
             bottomEdgeHandle.leftAnchor.constraint(equalTo: bottomLeftHandle.rightAnchor),
             bottomEdgeHandle.rightAnchor.constraint(equalTo: bottomRightHandle.leftAnchor),
-
+            
             leftEdgeHandle.topAnchor.constraint(equalTo: topLeftHandle.bottomAnchor),
             leftEdgeHandle.bottomAnchor.constraint(equalTo: bottomLeftHandle.topAnchor),
-
+            
             rightEdgeHandle.topAnchor.constraint(equalTo: topRightHandle.bottomAnchor),
             rightEdgeHandle.bottomAnchor.constraint(equalTo: bottomRightHandle.topAnchor),
         ])
     }
-
+    
     private func updateMinimumSizeConstraints() {
         var minimumSize = self.defaultMinimumSize
         if let _minumumSize = self.minimumSize {
@@ -343,30 +355,40 @@ extension RectangleSelectorView {
         minimumHeightConstraint.constant = minimumSize.height
         minimumWidthConstraint.constant = minimumSize.width
     }
+    
+    private func hideHandles(_ hide: Bool) {
+        handles.forEach {
+            $0.isHidden = hide
+        }
+    }
 }
 
 extension RectangleSelectorView: HandleViewDelegate {
     func handleView(_ view: HandleView, start touch: UITouch) {
+        guard isEnabled else { return }
         delegate?.rectangleSelector(self, willStartChanging: guideView.frame)
     }
-
+    
     func handleView(_ view: HandleView, end touch: UITouch) {
+        guard isEnabled else { return }
         delegate?.rectangleSelector(self, didEndChanging: guideView.frame)
     }
-
+    
     func handleView(_ view: HandleView, moved touch: UITouch) {
+        guard isEnabled else { return }
+        
         var location = touch.location(in: self)
-
+        
         // consider touched position in handle
         location.x -= view.gestureStartPoint.x
         location.y -= view.gestureStartPoint.y
-
+        
         // Absolute handle position in self
         let horizontal = location.x + view.frame.width / 2
         let vertical = location.y + view.frame.height / 2
-
+        
         let minimumSize = minimumSize ?? defaultMinimumSize
-
+        
         switch aspectMode {
         case .free:
             if [topEdgeHandle, topLeftHandle, topRightHandle].contains(view) {
@@ -382,7 +404,7 @@ extension RectangleSelectorView: HandleViewDelegate {
                     topConstraint.constant = vertical
                 }
             }
-
+            
             if [bottomEdgeHandle, bottomLeftHandle, bottomRightHandle].contains(view) {
                 let diff = vertical - topConstraint.constant - heightConstraint.constant
                 if heightConstraint.constant + diff < minimumSize.height {
@@ -393,7 +415,7 @@ extension RectangleSelectorView: HandleViewDelegate {
                     heightConstraint.constant += diff
                 }
             }
-
+            
             if [leftEdgeHandle, topLeftHandle, bottomLeftHandle].contains(view) {
                 let diff = (horizontal - leftConstraint.constant)
                 if widthConstraint.constant - diff < minimumSize.width {
@@ -407,7 +429,7 @@ extension RectangleSelectorView: HandleViewDelegate {
                     leftConstraint.constant = horizontal
                 }
             }
-
+            
             if [rightEdgeHandle, topRightHandle, bottomRightHandle].contains(view) {
                 let diff = horizontal - leftConstraint.constant - widthConstraint.constant
                 if widthConstraint.constant + diff < minimumSize.width {
@@ -418,7 +440,7 @@ extension RectangleSelectorView: HandleViewDelegate {
                     widthConstraint.constant += diff
                 }
             }
-
+            
         case let .fixed(aspectRatio):
             switch view {
             case topLeftHandle:
@@ -431,7 +453,7 @@ extension RectangleSelectorView: HandleViewDelegate {
                 let size = CGSize(
                     width: widthConstraint.constant - diffX,
                     height: heightConstraint.constant - diffY
-                ).adjusted(        withAspect: aspectRatio, max: max, min: minimumSize)
+                ).adjusted(withAspect: aspectRatio, max: max, min: minimumSize)
                 topConstraint.constant -= size.height - heightConstraint.constant
                 leftConstraint.constant -= size.width - widthConstraint.constant
                 widthConstraint.constant = size.width
@@ -446,7 +468,7 @@ extension RectangleSelectorView: HandleViewDelegate {
                 let size = CGSize(
                     width: widthConstraint.constant + diffX,
                     height: heightConstraint.constant - diffY
-                ).adjusted(        withAspect: aspectRatio, max: max, min: minimumSize)
+                ).adjusted(withAspect: aspectRatio, max: max, min: minimumSize)
                 topConstraint.constant -= size.height - heightConstraint.constant
                 widthConstraint.constant = size.width
                 heightConstraint.constant = size.height
@@ -481,31 +503,36 @@ extension RectangleSelectorView: HandleViewDelegate {
                 break
             }
         }
-
+        
         delegate?.rectangleSelector(self, didUpdate: guideView.frame)
+        sendActions(for: [.valueChanged, .primaryActionTriggered])
     }
 }
 
 extension RectangleSelectorView: GuideViewDelegate {
     func guideView(_ view: GuideView, start touch: UITouch) {
+        guard isEnabled else { return }
         delegate?.rectangleSelector(self, willStartChanging: guideView.frame)
     }
-
+    
     func guideView(_ view: GuideView, end touch: UITouch) {
+        guard isEnabled else { return }
         delegate?.rectangleSelector(self, didEndChanging: guideView.frame)
     }
-
+    
     func guideView(_ view: GuideView, moved touch: UITouch) {
+        guard isEnabled else { return }
+        
         var location = touch.location(in: self)
         location.x -= view.gestureStartPoint.x
         location.y -= view.gestureStartPoint.y
-
+        
         let horizontal = location.x - view.frame.minX
         let vertical = location.y - view.frame.minY
-
+        
         var shouldUpdateStartPointX = false
         var shouldUpdateStartPointY = false
-
+        
         if topConstraint.constant + vertical < 0 {
             topConstraint.constant = 0
             shouldUpdateStartPointY = true
@@ -515,7 +542,7 @@ extension RectangleSelectorView: GuideViewDelegate {
         } else {
             topConstraint.constant += vertical
         }
-
+        
         if leftConstraint.constant + horizontal < 0 {
             leftConstraint.constant = 0
             shouldUpdateStartPointX = true
@@ -525,7 +552,7 @@ extension RectangleSelectorView: GuideViewDelegate {
         } else {
             leftConstraint.constant += horizontal
         }
-
+        
         if shouldUpdateStartPointX || shouldUpdateStartPointY {
             setNeedsLayout()
             layoutIfNeeded()
@@ -533,8 +560,9 @@ extension RectangleSelectorView: GuideViewDelegate {
             if shouldUpdateStartPointX { view.gestureStartPoint.x = locationInGuide.x }
             if shouldUpdateStartPointY { view.gestureStartPoint.y = locationInGuide.y }
         }
-
+        
         delegate?.rectangleSelector(self, didUpdate: guideView.frame)
+        sendActions(for: [.valueChanged, .primaryActionTriggered])
     }
 }
 
@@ -549,10 +577,10 @@ private extension CGSize {
         } else if width * aspectRatio > height {
             width = height / aspectRatio
         }
-
+        
         return .init(width: width, height: height)
     }
-
+    
     func adjusted(
         withAspect aspectRatio: CGFloat,
         max: CGSize,
